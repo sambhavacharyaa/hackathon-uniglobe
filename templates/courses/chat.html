@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}AI assistant &middot; {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>✨ AI doubt-solving assistant</h1>
+        <p class="page-subtitle">{{ course.title }} &middot; ask anything about this course</p>
+    </div>
+    <a href="{% url 'course-detail' course.slug %}" class="btn btn-secondary">&larr; Back to course</a>
+</div>
+
+<div class="chat-shell">
+    <div class="chat-messages" id="chat-messages">
+        {% if not thread_messages %}
+            <div class="chat-empty" id="chat-empty">Ask a question about this course to get started.</div>
+        {% endif %}
+        {% for m in thread_messages %}
+            <div class="chat-bubble chat-bubble-{{ m.role }}">{{ m.content }}</div>
+        {% endfor %}
+    </div>
+    <form class="chat-form" id="chat-form">
+        {% csrf_token %}
+        <textarea id="chat-input" rows="1" placeholder="Ask a question about this course…" required></textarea>
+        <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+</div>
+
+<script>
+    (function () {
+        var messagesEl = document.getElementById("chat-messages");
+        var emptyEl = document.getElementById("chat-empty");
+        var form = document.getElementById("chat-form");
+        var input = document.getElementById("chat-input");
+        var csrfToken = form.querySelector("[name=csrfmiddlewaretoken]").value;
+        var sendUrl = "{% url 'chat-send' course.slug %}";
+
+        function scrollToBottom() {
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        function addBubble(role, text) {
+            if (emptyEl) { emptyEl.remove(); emptyEl = null; }
+            var div = document.createElement("div");
+            div.className = "chat-bubble chat-bubble-" + role;
+            div.textContent = text;
+            messagesEl.appendChild(div);
+            scrollToBottom();
+            return div;
+        }
+
+        function addTyping() {
+            var div = document.createElement("div");
+            div.className = "chat-typing";
+            div.id = "chat-typing";
+            div.innerHTML = "<span></span><span></span><span></span>";
+            messagesEl.appendChild(div);
+            scrollToBottom();
+        }
+
+        function removeTyping() {
+            var el = document.getElementById("chat-typing");
+            if (el) el.remove();
+        }
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            var message = input.value.trim();
+            if (!message) return;
+
+            addBubble("user", message);
+            input.value = "";
+            input.style.height = "auto";
+            addTyping();
+
+            var body = new URLSearchParams();
+            body.set("message", message);
+            body.set("csrfmiddlewaretoken", csrfToken);
+
+            fetch(sendUrl, { method: "POST", body: body, headers: { "X-Requested-With": "XMLHttpRequest" } })
+                .then(function (resp) { return resp.json().then(function (data) { return { ok: resp.ok, data: data }; }); })
+                .then(function (result) {
+                    removeTyping();
+                    if (result.ok) {
+                        addBubble("model", result.data.reply);
+                    } else {
+                        addBubble("error", result.data.error || "Something went wrong. Please try again.");
+                    }
+                })
+                .catch(function () {
+                    removeTyping();
+                    addBubble("error", "Couldn't reach the server. Please try again.");
+                });
+        });
+
+        input.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                form.requestSubmit();
+            }
+        });
+
+        input.addEventListener("input", function () {
+            input.style.height = "auto";
+            input.style.height = Math.min(input.scrollHeight, 120) + "px";
+        });
+
+        scrollToBottom();
+    })();
+</script>
+{% endblock %}

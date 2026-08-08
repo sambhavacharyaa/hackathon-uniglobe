@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% load course_extras %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block container_class %}container-wide{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ course.title }}</h1>
+        <p class="page-subtitle">Taught by {{ course.instructor.first_name|default:course.instructor.email }}</p>
+    </div>
+    <div style="display:flex; align-items:center; gap: var(--space-4);">
+        <div style="min-width:180px;">
+            <div class="meter">
+                <div class="meter-track"><div class="meter-fill" style="width: {{ progress_percent }}%;"></div></div>
+                <span class="meter-label">{{ progress_percent }}%</span>
+            </div>
+        </div>
+        <a href="{% url 'course-chat' course.slug %}" class="btn btn-primary">💬 Ask AI</a>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div>
+        <div class="section">
+            <div class="section-header"><h2>Lessons</h2></div>
+            {% if lessons %}
+                {% for lesson in lessons %}
+                    <div class="card">
+                        <div class="list-row" style="border:none; padding:0; margin-bottom: var(--space-2);">
+                            <div class="list-row-main">
+                                <form method="post" action="{% url 'complete-lesson' course.slug lesson.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="check-circle {% if lesson.id in completed_ids %}done{% endif %}" title="Mark complete">&#10003;</button>
+                                </form>
+                                <div>
+                                    <div class="list-row-title">{{ lesson.title }}</div>
+                                    {% if lesson.content %}<div class="list-row-meta">{{ lesson.content|truncatewords:16 }}</div>{% endif %}
+                                </div>
+                            </div>
+                            {% if lesson.id in completed_ids %}<span class="badge badge-good">Done</span>{% endif %}
+                        </div>
+
+                        {% if lesson.resources.all %}
+                            <div class="resource-list">
+                                {% for r in lesson.resources.all %}
+                                    <div class="resource-item">
+                                        <div class="resource-item-header">
+                                            <span class="resource-icon">
+                                                {% if r.kind == "video" %}🎬{% elif r.kind == "note" %}📝{% elif r.kind == "file" %}📎{% else %}🔗{% endif %}
+                                            </span>
+                                            {{ r.title }}
+                                        </div>
+                                        {% if r.kind == "video" and r.embed_url %}
+                                            <div class="resource-video-embed"><iframe src="{{ r.embed_url }}" allowfullscreen></iframe></div>
+                                        {% elif r.kind == "video" or r.kind == "link" %}
+                                            <a href="{{ r.url }}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:var(--space-2);">Open link &rarr;</a>
+                                        {% elif r.kind == "file" and r.file %}
+                                            <a href="{{ r.file.url }}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:var(--space-2);">Download &rarr;</a>
+                                        {% elif r.kind == "note" %}
+                                            <div class="resource-note-text">{{ r.text }}</div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% if lesson.quiz %}
+                            {% with attempt=best_attempt_by_quiz|get_item:lesson.quiz.id %}
+                                <div class="list-row" style="border:none; padding: var(--space-3) 0 0; margin:0;">
+                                    <div class="list-row-meta">✨ {{ lesson.quiz.question_count }}-question AI quiz</div>
+                                    <div class="list-row-actions">
+                                        {% if attempt %}<span class="badge badge-good">Best: {{ attempt.score_percent }}%</span>{% endif %}
+                                        <a href="{% url 'take-quiz' course.slug lesson.id %}" class="btn btn-secondary btn-sm">{% if attempt %}Retake quiz{% else %}Take quiz{% endif %}</a>
+                                    </div>
+                                </div>
+                            {% endwith %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>No lessons published yet.</p></div>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <div class="section-header"><h2>Assignments</h2></div>
+            {% if assignments %}
+                {% for a in assignments %}
+                    <div class="card">
+                        <div class="list-row" style="border:none; padding:0; margin-bottom: var(--space-3);">
+                            <div class="list-row-main">
+                                <div>
+                                    <div class="list-row-title">{{ a.title }}</div>
+                                    <div class="list-row-meta">
+                                        {% if a.due_date %}Due {{ a.due_date|date:"M j, g:i A" }}{% else %}No due date{% endif %}
+                                        &middot; {{ a.max_points }} pts
+                                    </div>
+                                </div>
+                            </div>
+                            {% with sub=submissions_by_assignment|get_item:a.id %}
+                                {% if sub.is_graded %}
+                                    <span class="badge badge-good">Graded: {{ sub.grade }}/{{ a.max_points }}</span>
+                                {% elif sub %}
+                                    <span class="badge badge-warning">Submitted</span>
+                                {% else %}
+                                    <span class="badge badge-neutral">Not submitted</span>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                        {% if a.description %}<p>{{ a.description }}</p>{% endif %}
+                        {% with sub=submissions_by_assignment|get_item:a.id %}
+                            {% if sub and sub.is_graded %}
+                                {% if sub.feedback %}
+                                    <div class="help-text" style="margin-top:var(--space-2);"><strong>Feedback:</strong> {{ sub.feedback }}</div>
+                                {% endif %}
+                            {% else %}
+                                <form method="post" action="{% url 'submit-assignment' course.slug a.id %}">
+                                    {% csrf_token %}
+                                    <div class="form-field">
+                                        <textarea name="content" rows="3" placeholder="Write your submission here…" required>{% if sub %}{{ sub.content }}{% endif %}</textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm">{% if sub %}Resubmit{% else %}Submit{% endif %}</button>
+                                </form>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>No assignments posted yet.</p></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="section">
+            <div class="section-header"><h2>Announcements</h2></div>
+            {% if announcements %}
+                {% for a in announcements %}
+                    <div class="card">
+                        <div class="list-row-meta" style="margin-bottom: var(--space-1);">{{ a.created_at|date:"M j" }}</div>
+                        <div class="list-row-title" style="margin-bottom: var(--space-1);">{{ a.title }}</div>
+                        <p style="margin:0;">{{ a.body }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>No announcements yet.</p></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

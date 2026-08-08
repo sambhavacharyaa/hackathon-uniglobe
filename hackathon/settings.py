@@ -10,10 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -37,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'core',
+    'courses',
+    'ai',
     'django.contrib.staticfiles',
 ]
 
@@ -119,7 +126,66 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Media files (user uploads)
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Custom user model
+# https://docs.djangoproject.com/en/5.1/topics/auth/customizing/#substituting-a-custom-user-model
+
+AUTH_USER_MODEL = 'core.User'
+
+
+# Auth redirects
+# https://docs.djangoproject.com/en/5.1/ref/settings/#login-url
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'dashboard'
+LOGOUT_REDIRECT_URL = 'login'
+
+
+# Email / SMTP (used for OTP verification emails)
+# https://docs.djangoproject.com/en/5.1/topics/email/
+#
+# Fill in EMAIL_HOST_USER + EMAIL_HOST_PASSWORD in .env (see .env.example) to
+# send real emails via your cPanel mailbox. Until then, OTP emails just print
+# to the console so you can develop without live credentials.
+
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 465))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'True') == 'True'
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'False') == 'True'
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# OTP settings
+
+OTP_LENGTH = 6
+OTP_VALIDITY_MINUTES = 10
+OTP_RESEND_COOLDOWN_SECONDS = 60
+
+
+# OpenRouter (AI features: marksheet review, doubt chatbot, quiz generation)
+# Leave OPENROUTER_API_KEY blank in .env to run with AI features gracefully
+# disabled (they show a "not configured yet" message instead of erroring).
+# Get a key at https://openrouter.ai/keys — browse models/pricing (including
+# free-tier options) at https://openrouter.ai/models. OpenRouter's free-tier
+# lineup changes over time; if OPENROUTER_MODEL starts 404ing, check
+# https://openrouter.ai/api/v1/models for current ":free"-suffixed slugs.
+
+OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', '')
+OPENROUTER_MODEL = os.environ.get('OPENROUTER_MODEL', 'openai/gpt-oss-20b:free')

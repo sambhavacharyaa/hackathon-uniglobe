@@ -1,0 +1,7 @@
+/*
+ * Kept for backward compatibility with anything still linking css/index.css.
+ * The real styles live in theme.css (design tokens) and components.css
+ * (everything built from them) — edit those instead.
+ */
+@import url("theme.css");
+@import url("components.css");

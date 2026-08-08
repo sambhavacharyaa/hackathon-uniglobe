@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Add resource &middot; {{ lesson.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Add a resource</h1>
+    <a href="{% url 'course-detail' course.slug %}" class="btn btn-secondary">Cancel</a>
+</div>
+
+<div class="card" style="max-width: 640px;">
+    <p class="page-subtitle" style="margin-top:-8px;">For lesson: <strong>{{ lesson.title }}</strong></p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<ul class="errorlist">{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+
+        <div class="form-field">
+            <label for="{{ form.kind.id_for_label }}">{{ form.kind.label }}</label>
+            {{ form.kind }}
+        </div>
+        <div class="form-field">
+            <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+            {{ form.title }}
+            {% for error in form.title.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="kind-field-group" data-kind-group="video link">
+            <div class="form-field">
+                <label for="{{ form.url.id_for_label }}">{{ form.url.label }}</label>
+                {{ form.url }}
+                {% for error in form.url.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+                <p class="help-text">For video, paste a YouTube or Vimeo link — it'll be embedded automatically.</p>
+            </div>
+        </div>
+
+        <div class="kind-field-group" data-kind-group="file">
+            <div class="form-field">
+                <label for="{{ form.file.id_for_label }}">{{ form.file.label }}</label>
+                {{ form.file }}
+                {% for error in form.file.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            </div>
+        </div>
+
+        <div class="kind-field-group" data-kind-group="note">
+            <div class="form-field">
+                <label for="{{ form.text.id_for_label }}">{{ form.text.label }}</label>
+                {{ form.text }}
+                {% for error in form.text.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label for="{{ form.order.id_for_label }}">{{ form.order.label }}</label>
+            {{ form.order }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add resource</button>
+    </form>
+</div>
+
+<script>
+    (function () {
+        var select = document.querySelector("[data-resource-kind-select]");
+        var groups = document.querySelectorAll("[data-kind-group]");
+
+        function sync() {
+            var kind = select.value;
+            groups.forEach(function (group) {
+                var kinds = group.getAttribute("data-kind-group").split(" ");
+                group.classList.toggle("is-visible", kinds.indexOf(kind) !== -1);
+            });
+        }
+
+        select.addEventListener("change", sync);
+        sync();
+    })();
+</script>
+{% endblock %}

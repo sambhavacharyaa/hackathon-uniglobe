@@ -14,28 +14,20 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import static
+from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+from django.views.generic import RedirectView
 
 from hackathon import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', RedirectView.as_view(pattern_name='login', permanent=False)),
+    path('', include('core.urls')),
+    path('courses/', include('courses.urls')),
+    path('marksheet/', include('ai.urls')),
 ]
 
 if settings.DEBUG:
-
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-# URL prefix for uploaded media files
-
-MEDIA_URL = "/media/"
-
-# Directory where uploaded files are stored
-
-MEDIA_ROOT = settings.BASE_DIR / "media"
-
-# URL prefix for static files
-
-STATIC_URL = "static/"

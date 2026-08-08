@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}My marksheet reviews{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Marksheet reviews</h1>
+        <p class="page-subtitle">AI-reviewed academic performance history.</p>
+    </div>
+    <a href="{% url 'marksheet-upload' %}" class="btn btn-primary">+ Upload marksheet</a>
+</div>
+
+{% if marksheets %}
+    {% for m in marksheets %}
+        <a href="{% url 'marksheet-detail' m.id %}" class="list-row" style="text-decoration:none; color:inherit;">
+            <div class="list-row-main">
+                <div>
+                    <div class="list-row-title">{{ m.created_at|date:"M j, Y — g:i A" }}</div>
+                    <div class="list-row-meta">{{ m.entries|length }} subject{{ m.entries|length|pluralize }}</div>
+                </div>
+            </div>
+            {% if m.is_reviewed %}
+                <span class="badge badge-good">{{ m.average_percent }}% avg</span>
+            {% elif m.error %}
+                <span class="badge badge-critical">Review failed</span>
+            {% else %}
+                <span class="badge badge-neutral">Pending</span>
+            {% endif %}
+        </a>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <p>You haven't uploaded a marksheet yet.</p>
+        <a href="{% url 'marksheet-upload' %}" class="btn btn-primary btn-sm">Upload your first marksheet</a>
+    </div>
+{% endif %}
+{% endblock %}

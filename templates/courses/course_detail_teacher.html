@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.title }}{% endblock %}
+{% block container_class %}container-wide{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ course.title }}</h1>
+        <p class="page-subtitle">
+            {% if course.is_published %}<span class="badge badge-good">Published</span>{% else %}<span class="badge badge-neutral">Draft</span>{% endif %}
+            &middot; {{ course.student_count }} student{{ course.student_count|pluralize }}
+        </p>
+    </div>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">&larr; Dashboard</a>
+</div>
+
+<div class="dashboard-grid">
+    <div>
+        <div class="section">
+            <div class="section-header">
+                <h2>Lessons</h2>
+                <a href="{% url 'add-lesson' course.slug %}" class="btn btn-secondary btn-sm">+ Add lesson</a>
+            </div>
+            {% if lessons %}
+                {% for lesson in lessons %}
+                    <div class="card">
+                        <div class="list-row" style="border:none; padding:0; margin-bottom: var(--space-2);">
+                            <div class="list-row-main">
+                                <div>
+                                    <div class="list-row-title">{{ lesson.order }}. {{ lesson.title }}</div>
+                                    {% if lesson.content %}<div class="list-row-meta">{{ lesson.content|truncatewords:16 }}</div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="list-row-actions">
+                                <a href="{% url 'add-resource' course.slug lesson.id %}" class="btn btn-ghost btn-sm">+ Resource</a>
+                                <form method="post" action="{% url 'generate-quiz' course.slug lesson.id %}" class="inline-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-ghost btn-sm">
+                                        {% if lesson.quiz %}↻ Regenerate quiz{% else %}✨ Generate quiz{% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        {% if lesson.quiz %}
+                            <span class="badge badge-good">Quiz: {{ lesson.quiz.question_count }} questions</span>
+                        {% endif %}
+
+                        {% if lesson.resources.all %}
+                            <div class="resource-list">
+                                {% for r in lesson.resources.all %}
+                                    <div class="resource-item">
+                                        <div class="resource-item-header">
+                                            <span class="resource-icon">
+                                                {% if r.kind == "video" %}🎬{% elif r.kind == "note" %}📝{% elif r.kind == "file" %}📎{% else %}🔗{% endif %}
+                                            </span>
+                                            {{ r.title }}
+                                            <span class="badge badge-neutral">{{ r.get_kind_display }}</span>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>No lessons yet.</p>
+                    <a href="{% url 'add-lesson' course.slug %}" class="btn btn-primary btn-sm">Add your first lesson</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2>Assignments</h2>
+                <a href="{% url 'add-assignment' course.slug %}" class="btn btn-secondary btn-sm">+ Add assignment</a>
+            </div>
+            {% if assignments %}
+                {% for a in assignments %}
+                    <a href="{% url 'view-submissions' course.slug a.id %}" class="list-row" style="text-decoration:none; color:inherit;">
+                        <div class="list-row-main">
+                            <div>
+                                <div class="list-row-title">{{ a.title }}</div>
+                                <div class="list-row-meta">
+                                    {% if a.due_date %}Due {{ a.due_date|date:"M j, g:i A" }}{% else %}No due date{% endif %}
+                                    &middot; {{ a.max_points }} pts &middot; {{ a.submissions.count }} submission{{ a.submissions.count|pluralize }}
+                                </div>
+                            </div>
+                        </div>
+                        <span class="btn btn-ghost btn-sm">View submissions &rarr;</span>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>No assignments yet.</p>
+                    <a href="{% url 'add-assignment' course.slug %}" class="btn btn-primary btn-sm">Add your first assignment</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2>Announcements</h2>
+                <a href="{% url 'add-announcement' course.slug %}" class="btn btn-secondary btn-sm">+ Post announcement</a>
+            </div>
+            {% if announcements %}
+                {% for a in announcements %}
+                    <div class="card">
+                        <div class="list-row-meta" style="margin-bottom: var(--space-1);">{{ a.created_at|date:"M j" }}</div>
+                        <div class="list-row-title" style="margin-bottom: var(--space-1);">{{ a.title }}</div>
+                        <p style="margin:0;">{{ a.body }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>No announcements posted yet.</p></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="section">
+            <div class="section-header"><h2>Roster</h2></div>
+            {% if roster %}
+                {% for enrollment in roster %}
+                    <div class="list-row">
+                        <div class="list-row-main">
+                            <div class="avatar">{{ enrollment.student.first_name|default:enrollment.student.email|slice:":1" }}</div>
+                            <div>
+                                <div class="list-row-title">{{ enrollment.student.first_name }} {{ enrollment.student.last_name }}</div>
+                                <div class="list-row-meta">{{ enrollment.student.email }}</div>
+                            </div>
+                        </div>
+                        <div class="list-row-actions">
+                            {% if enrollment.student_id in has_insight_ids %}
+                                <a href="{% url 'student-insight' course.slug enrollment.student_id %}" class="badge badge-good" style="text-decoration:none;">✨ AI insight</a>
+                            {% endif %}
+                            <span class="badge badge-neutral">{{ enrollment.progress_percent }}%</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>No students enrolled yet.</p></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

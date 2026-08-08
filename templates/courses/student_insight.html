@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}AI insight &middot; {{ student.email }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ student.first_name }} {{ student.last_name }}</h1>
+        <p class="page-subtitle">{{ student.email }} &middot; {{ course.title }}</p>
+    </div>
+    <a href="{% url 'course-detail' course.slug %}" class="btn btn-secondary">&larr; Back to course</a>
+</div>
+
+{% if marksheet %}
+    <div class="card">
+        <span class="ai-card-label">✨ AI teaching suggestions</span>
+        <p style="color: var(--color-text); white-space: pre-wrap;">{{ marksheet.teacher_suggestions }}</p>
+    </div>
+
+    <div class="dashboard-grid" style="margin-top: var(--space-5);">
+        <div>
+            {% if marksheet.strengths %}
+                <div class="section">
+                    <div class="section-header"><h2>Strengths</h2></div>
+                    <div class="chip-row">
+                        {% for s in marksheet.strengths %}<span class="chip chip-good">{{ s }}</span>{% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            {% if marksheet.weaknesses %}
+                <div class="section">
+                    <div class="section-header"><h2>Weak areas</h2></div>
+                    <div class="chip-row">
+                        {% for w in marksheet.weaknesses %}<span class="chip chip-warning">{{ w }}</span>{% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <div>
+            <div class="stat-tile">
+                <span class="stat-label">Marksheet average</span>
+                <span class="stat-value">{{ marksheet.average_percent }}%</span>
+                <span class="stat-hint">Submitted {{ marksheet.created_at|date:"M j, Y" }}</span>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="empty-state"><p>This student hasn't uploaded a marksheet for AI review yet.</p></div>
+{% endif %}
+{% endblock %}

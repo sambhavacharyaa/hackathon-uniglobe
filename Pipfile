@@ -4,6 +4,10 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+django = "*"
+python-dotenv = "*"
+google-genai = "*"
+openai = "*"
 
 [dev-packages]
 

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Upload marksheet{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Upload your marksheet</h1>
+        <p class="page-subtitle">Enter your subject scores and AI will review your performance.</p>
+    </div>
+    <a href="{% url 'marksheet-list' %}" class="btn btn-secondary">My reviews</a>
+</div>
+
+<div class="card" style="max-width: 720px;">
+    <form method="post">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        {% if formset.non_form_errors %}
+            <ul class="errorlist">{% for e in formset.non_form_errors %}<li>{{ e }}</li>{% endfor %}</ul>
+        {% endif %}
+
+        <div class="marksheet-rows">
+            <div class="marksheet-row">
+                <label class="help-text" style="margin:0;">Subject</label>
+                <label class="help-text" style="margin:0;">Score</label>
+                <span></span>
+                <label class="help-text" style="margin:0;">Out of</label>
+            </div>
+            {% for form in formset %}
+                <div class="marksheet-row">
+                    <div class="form-field">{{ form.subject }}</div>
+                    <div class="form-field">{{ form.score }}</div>
+                    <div class="marksheet-row-sep">/</div>
+                    <div class="form-field">{{ form.max_score }}</div>
+                </div>
+                {% for error in form.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            {% endfor %}
+        </div>
+
+        <div style="margin-top: var(--space-5);">
+            <button type="submit" class="btn btn-primary">Review with AI</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Marksheet review{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Your marksheet review</h1>
+        <p class="page-subtitle">Submitted {{ marksheet.created_at|date:"M j, Y" }}</p>
+    </div>
+    <a href="{% url 'marksheet-list' %}" class="btn btn-secondary">&larr; All reviews</a>
+</div>
+
+<div class="dashboard-grid">
+    <div>
+        <div class="section">
+            <div class="section-header"><h2>Scores</h2></div>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead><tr><th>Subject</th><th>Score</th><th>%</th></tr></thead>
+                    <tbody>
+                        {% for e in marksheet.entries %}
+                            <tr>
+                                <td>{{ e.subject }}</td>
+                                <td>{{ e.score }}/{{ e.max_score }}</td>
+                                <td>{% widthratio e.score e.max_score 100 %}%</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if marksheet.is_reviewed %}
+            <div class="section">
+                <div class="section-header"><h2>AI feedback for you</h2></div>
+                <div class="ai-card">
+                    <span class="ai-card-label">✨ AI review</span>
+                    <p>{{ marksheet.overall_summary }}</p>
+                    <p style="color: var(--color-text); white-space: pre-wrap;">{{ marksheet.student_suggestions }}</p>
+                </div>
+            </div>
+        {% elif marksheet.error %}
+            <div class="empty-state">
+                <p>The AI review couldn't be completed: {{ marksheet.error }}</p>
+                <a href="{% url 'marksheet-upload' %}" class="btn btn-primary btn-sm">Try again</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div>
+        {% if marksheet.is_reviewed %}
+            <div class="section">
+                <div class="section-header"><h2>Average</h2></div>
+                <div class="stat-tile">
+                    <span class="stat-label">Overall</span>
+                    <span class="stat-value">{{ marksheet.average_percent }}%</span>
+                </div>
+            </div>
+            {% if marksheet.strengths %}
+                <div class="section">
+                    <div class="section-header"><h2>Strengths</h2></div>
+                    <div class="chip-row">
+                        {% for s in marksheet.strengths %}<span class="chip chip-good">{{ s }}</span>{% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            {% if marksheet.weaknesses %}
+                <div class="section">
+                    <div class="section-header"><h2>Focus areas</h2></div>
+                    <div class="chip-row">
+                        {% for w in marksheet.weaknesses %}<span class="chip chip-warning">{{ w }}</span>{% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

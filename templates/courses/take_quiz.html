@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load course_extras %}
+
+{% block title %}{{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ quiz.title }}</h1>
+        <p class="page-subtitle">{{ course.title }} &middot; {{ lesson.title }}</p>
+    </div>
+    <a href="{% url 'course-detail' course.slug %}" class="btn btn-secondary">&larr; Back to course</a>
+</div>
+
+{% if result %}
+    <div class="quiz-score-banner">
+        <div>
+            <span class="stat-label">Your score</span>
+            <div class="stat-value">{{ result.correct_count }}/{{ result.total_questions }} ({{ result.score_percent }}%)</div>
+        </div>
+        <a href="{% url 'take-quiz' course.slug lesson.id %}" class="btn btn-primary">Retake quiz</a>
+    </div>
+{% endif %}
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        {% for q in questions %}
+            <div class="quiz-question">
+                <div class="quiz-question-title">{{ forloop.counter }}. {{ q.text }}</div>
+                {% for choice in q.choices %}
+                    {% with idx=forloop.counter0 %}
+                        <label class="quiz-choice
+                            {% if result %}
+                                {% if idx == q.correct_index %}is-correct
+                                {% elif idx == result.answers|get_item:q.id and idx != q.correct_index %}is-incorrect{% endif %}
+                            {% endif %}">
+                            <input type="radio" name="question_{{ q.id }}" value="{{ idx }}"
+                                {% if result %}disabled{% endif %}
+                                {% if result and result.answers|get_item:q.id == idx %}checked{% endif %}>
+                            {{ choice }}
+                        </label>
+                    {% endwith %}
+                {% endfor %}
+                {% if result %}
+                    <div class="quiz-explanation">{{ q.explanation }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        {% if not result %}
+            <button type="submit" class="btn btn-primary">Submit quiz</button>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

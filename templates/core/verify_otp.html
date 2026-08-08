@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Verify your email{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+    <h1>Verify your email</h1>
+    <p class="help-text">Enter the 6-digit code we emailed you.</p>
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <ul class="errorlist">
+                {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+        {{ form.email }}
+        <div class="form-field">
+            <label for="{{ form.code.id_for_label }}">{{ form.code.label }}</label>
+            {{ form.code }}
+            {% for error in form.code.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        </div>
+        <button type="submit" class="btn-primary">Verify</button>
+    </form>
+    <p class="auth-switch">
+        Didn't get a code?
+        <a href="{% url 'resend-otp' %}?email={{ form.email.value|default:'' }}">Resend it</a>
+    </p>
+</div>
+{% endblock %}

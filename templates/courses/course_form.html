@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}New course{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Create a course</h1>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+</div>
+
+<div class="card" style="max-width: 560px;">
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<ul class="errorlist">{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% for field in form %}
+            <div class="form-field">
+                {% if field.name == "is_published" %}
+                    <div class="checkbox-field">
+                        {{ field }}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    </div>
+                {% else %}
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                {% endif %}
+                {% if field.help_text %}<p class="help-text">{{ field.help_text|safe }}</p>{% endif %}
+                {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Create course</button>
+    </form>
+</div>
+{% endblock %}

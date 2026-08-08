@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load course_extras %}
+
+{% block title %}Submissions &middot; {{ assignment.title }}{% endblock %}
+{% block container_class %}container-wide{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ assignment.title }}</h1>
+        <p class="page-subtitle">{{ course.title }} &middot; {{ submissions.count }} submission{{ submissions.count|pluralize }}</p>
+    </div>
+    <a href="{% url 'course-detail' course.slug %}" class="btn btn-secondary">&larr; Back to course</a>
+</div>
+
+{% if submissions %}
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Submitted</th>
+                    <th>Content</th>
+                    <th>Grade</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in submissions %}
+                    <tr>
+                        <td>{{ s.student.first_name }} {{ s.student.last_name }}<br><span class="list-row-meta">{{ s.student.email }}</span></td>
+                        <td>{{ s.submitted_at|date:"M j, g:i A" }}</td>
+                        <td style="max-width:280px;">{{ s.content|truncatewords:25 }}</td>
+                        <td>
+                            {% if s.is_graded %}
+                                <span class="badge badge-good">{{ s.grade }}/{{ assignment.max_points }}</span>
+                            {% else %}
+                                <span class="badge badge-warning">Ungraded</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% with gform=grade_forms|get_item:s.id %}
+                            <form method="post" action="{% url 'grade-submission' course.slug s.id %}" class="grade-form">
+                                {% csrf_token %}
+                                <div class="form-field">
+                                    {{ gform.grade }}
+                                </div>
+                                <div class="form-field">
+                                    {{ gform.feedback }}
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                            </form>
+                            {% endwith %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="empty-state"><p>No submissions yet.</p></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Your dashboard{% endblock %}
+{% block container_class %}container-wide{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Welcome back, {{ user.first_name|default:user.email }}</h1>
+        <p class="page-subtitle">Here's where your learning stands today.</p>
+    </div>
+    <a href="{% url 'catalog' %}" class="btn btn-primary">Browse courses</a>
+</div>
+
+<div class="section">
+    <div class="stat-grid">
+        <div class="stat-tile">
+            <span class="stat-label">Enrolled courses</span>
+            <span class="stat-value">{{ enrolled_count }}</span>
+        </div>
+        <div class="stat-tile">
+            <span class="stat-label">Completed</span>
+            <span class="stat-value">{{ completed_count }}</span>
+            <span class="stat-hint">100% of lessons done</span>
+        </div>
+        <div class="stat-tile">
+            <span class="stat-label">Average grade</span>
+            <span class="stat-value">{% if avg_grade is not None %}{{ avg_grade }}%{% else %}—{% endif %}</span>
+        </div>
+        <div class="stat-tile">
+            <span class="stat-label">Due soon</span>
+            <span class="stat-value">{{ upcoming|length }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div>
+        <div class="section">
+            <div class="section-header">
+                <h2>My courses</h2>
+            </div>
+            {% if enrollments %}
+                {% for e in enrollments %}
+                    <a href="{% url 'course-detail' e.course.slug %}" class="list-row" style="text-decoration:none; color:inherit; display:flex;">
+                        <div class="list-row-main">
+                            <div class="avatar">{{ e.course.title|slice:":1" }}</div>
+                            <div>
+                                <div class="list-row-title">{{ e.course.title }}</div>
+                                <div class="list-row-meta">by {{ e.course.instructor.first_name|default:e.course.instructor.email }}</div>
+                            </div>
+                        </div>
+                        <div class="list-row-actions" style="min-width:160px; justify-content:flex-end;">
+                            <div class="meter" style="min-width:120px;">
+                                <div class="meter-track"><div class="meter-fill" style="width: {{ e.progress_percent }}%;"></div></div>
+                                <span class="meter-label">{{ e.progress_percent }}%</span>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>You haven't enrolled in any courses yet.</p>
+                    <a href="{% url 'catalog' %}" class="btn btn-primary btn-sm">Browse courses</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="section">
+            <div class="section-header"><h2>Upcoming assignments</h2></div>
+            {% if upcoming %}
+                {% for item in upcoming %}
+                    <div class="list-row">
+                        <div class="list-row-main">
+                            <div>
+                                <div class="list-row-title">{{ item.assignment.title }}</div>
+                                <div class="list-row-meta">{{ item.assignment.course.title }}</div>
+                            </div>
+                        </div>
+                        {% if item.status == "critical" %}
+                            <span class="badge badge-critical">⚠ Overdue</span>
+                        {% elif item.status == "warning" %}
+                            <span class="badge badge-warning">⏰ Due soon</span>
+                        {% elif item.assignment.due_date %}
+                            <span class="badge badge-neutral">{{ item.assignment.due_date|date:"M j" }}</span>
+                        {% else %}
+                            <span class="badge badge-neutral">No due date</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>Nothing due. You're all caught up.</p></div>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <div class="ai-card">
+                <span class="ai-card-label">✨ AI marksheet review</span>
+                <p style="margin-bottom: var(--space-3);">Upload your scores and get personalized improvement tips.</p>
+                <a href="{% url 'marksheet-upload' %}" class="btn btn-primary btn-sm">Upload marksheet</a>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header"><h2>Announcements</h2></div>
+            {% if announcements %}
+                {% for a in announcements %}
+                    <div class="card">
+                        <div class="list-row-meta" style="margin-bottom: var(--space-1);">{{ a.course.title }} &middot; {{ a.created_at|date:"M j" }}</div>
+                        <div class="list-row-title" style="margin-bottom: var(--space-1);">{{ a.title }}</div>
+                        <p style="margin:0;">{{ a.body }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>No announcements yet.</p></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

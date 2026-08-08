@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Browse courses{% endblock %}
+{% block container_class %}container-wide{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Browse courses</h1>
+        <p class="page-subtitle">Find something new to learn.</p>
+    </div>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">&larr; Dashboard</a>
+</div>
+
+{% if courses %}
+    <div class="course-grid">
+        {% for course in courses %}
+            <div class="course-card">
+                <div class="course-card-title">{{ course.title }}</div>
+                <div class="course-card-meta">
+                    by {{ course.instructor.first_name|default:course.instructor.email }} &middot;
+                    {{ course.lesson_count }} lesson{{ course.lesson_count|pluralize }}
+                </div>
+                <p>{{ course.description|default:"No description yet."|truncatewords:20 }}</p>
+                <div class="course-card-footer">
+                    <span class="list-row-meta">{{ course.student_count }} student{{ course.student_count|pluralize }}</span>
+                    <form method="post" action="{% url 'enroll' course.slug %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-sm">Enroll</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state"><p>No new courses to enroll in right now — check back later.</p></div>
+{% endif %}
+{% endblock %}
