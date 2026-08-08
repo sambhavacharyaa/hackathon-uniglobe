@@ -44,7 +44,7 @@
                     </table>
                 </div>
 
-                <form method="post" action="{% url 'marksheet-approve' m.id %}" style="margin-bottom: var(--space-3);">
+                <form method="post" action="{% url 'marksheet-approve' m.id %}" style="margin-bottom: var(--space-3);" data-ai-loading="Generating the AI review…">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary btn-sm">✓ Approve &amp; run AI review</button>
                 </form>

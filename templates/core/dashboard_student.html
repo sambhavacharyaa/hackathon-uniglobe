@@ -154,6 +154,15 @@
         </div>
 
         <div class="section">
+            <div class="ai-card">
+                <span class="ai-card-label">✨ AI Viva</span>
+                <p style="margin-bottom: var(--space-3);">An oral exam that follows up on your answers — see if you really know it.</p>
+                <a href="{% url 'viva-start' %}" class="btn btn-primary btn-sm">Start a viva</a>
+                <a href="{% url 'viva-list' %}" class="btn btn-ghost btn-sm">My vivas</a>
+            </div>
+        </div>
+
+        <div class="section">
             <div class="section-header"><h2>Announcements</h2></div>
             {% if announcements %}
                 {% for a in announcements %}

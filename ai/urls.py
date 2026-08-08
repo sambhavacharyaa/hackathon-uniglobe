@@ -12,4 +12,8 @@ urlpatterns = [
     path("answer-sheets/", views.answer_sheet_list, name="answer-sheet-list"),
     path("answer-sheets/upload/", views.answer_sheet_upload, name="answer-sheet-upload"),
     path("answer-sheets/<int:review_id>/", views.answer_sheet_detail, name="answer-sheet-detail"),
+    path("viva/", views.viva_list, name="viva-list"),
+    path("viva/start/", views.viva_start, name="viva-start"),
+    path("viva/<int:session_id>/", views.viva_detail, name="viva-detail"),
+    path("viva/<int:session_id>/answer/", views.viva_answer, name="viva-answer"),
 ]

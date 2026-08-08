@@ -1,10 +1,12 @@
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from ai import llm
-from ai.forms import AnswerSheetUploadForm, MarksheetFormSet, MarksheetRejectForm
-from ai.models import AnswerSheetReview, Marksheet
+from ai.forms import AnswerSheetUploadForm, MarksheetFormSet, MarksheetRejectForm, VivaAnswerForm, VivaStartForm
+from ai.models import AnswerSheetReview, Marksheet, VivaSession, VivaTurn
 from courses.decorators import instructor_required, student_required
 from courses.models import Enrollment
 
@@ -185,3 +187,121 @@ def answer_sheet_detail(request, review_id):
 def answer_sheet_list(request):
     reviews = AnswerSheetReview.objects.filter(student=request.user)
     return render(request, "ai/answer_sheet_list.html", {"reviews": reviews})
+
+
+@student_required
+def viva_start(request):
+    if request.method == "POST":
+        form = VivaStartForm(request.POST, student=request.user)
+        if form.is_valid():
+            session = VivaSession.objects.create(
+                student=request.user,
+                course=form.cleaned_data["course"],
+                topic=form.cleaned_data["topic"],
+            )
+            try:
+                result = llm.generate_viva_question(session.topic, session.course, [])
+                VivaTurn.objects.create(session=session, round_number=1, question=result.get("question", ""))
+            except llm.LLMError as exc:
+                session.status = VivaSession.Status.COMPLETED
+                session.error = str(exc)
+                session.save()
+                messages.error(request, f"Couldn't start the viva: {exc}")
+                return redirect("viva-list")
+            return redirect("viva-detail", session.id)
+    else:
+        form = VivaStartForm(student=request.user)
+
+    return render(request, "ai/viva_start.html", {"form": form})
+
+
+@student_required
+def viva_detail(request, session_id):
+    session = get_object_or_404(VivaSession, id=session_id, student=request.user)
+    return render(
+        request,
+        "ai/viva_detail.html",
+        {"session": session, "turns": session.turns.all(), "answer_form": VivaAnswerForm()},
+    )
+
+
+@student_required
+@require_POST
+def viva_answer(request, session_id):
+    session = get_object_or_404(VivaSession, id=session_id, student=request.user)
+    if session.is_completed:
+        return JsonResponse({"error": "This viva has already finished."}, status=400)
+
+    turn = session.current_turn
+    if not turn:
+        return JsonResponse({"error": "No question is waiting for an answer right now."}, status=400)
+
+    if not turn.is_answered:
+        answer = request.POST.get("answer", "").strip()
+        if not answer:
+            return JsonResponse({"error": "Type or speak an answer first."}, status=400)
+        turn.answer = answer
+        turn.answered_at = timezone.now()
+        turn.save(update_fields=["answer", "answered_at"])
+    # else: the turn was already answered by a previous request whose AI call
+    # then failed (e.g. a timeout) — this is a retry, so just continue on
+    # from the already-saved answer instead of asking for it again.
+
+    transcript = [
+        {"question": t.question, "answer": t.answer} for t in session.turns.filter(answered_at__isnull=False)
+    ]
+
+    if turn.round_number >= VivaSession.MAX_ROUNDS:
+        try:
+            result = llm.generate_viva_verdict(session.topic, session.course, transcript)
+            session.verdict = result.get("verdict", "")
+            session.verdict_summary = result.get("summary", "")
+            session.strengths = result.get("strengths", [])
+            session.gaps = result.get("gaps", [])
+            session.suggestions = result.get("suggestions", "")
+        except llm.LLMError as exc:
+            session.error = str(exc)
+        session.status = VivaSession.Status.COMPLETED
+        session.completed_at = timezone.now()
+        session.save()
+
+        if session.error:
+            return JsonResponse({"error": session.error}, status=503)
+        return JsonResponse(
+            {
+                "type": "verdict",
+                "verdict_label": session.get_verdict_display(),
+                "verdict": session.verdict,
+                "summary": session.verdict_summary,
+                "strengths": session.strengths,
+                "gaps": session.gaps,
+                "suggestions": session.suggestions,
+            }
+        )
+
+    try:
+        result = llm.generate_viva_question(session.topic, session.course, transcript)
+    except llm.LLMError as exc:
+        return JsonResponse({"error": str(exc)}, status=503)
+
+    next_turn = VivaTurn.objects.create(
+        session=session,
+        round_number=turn.round_number + 1,
+        question=result.get("question", ""),
+        probe_reason=result.get("probe_reason", ""),
+    )
+    return JsonResponse(
+        {
+            "type": "question",
+            "round": next_turn.round_number,
+            "max_rounds": VivaSession.MAX_ROUNDS,
+            "question": next_turn.question,
+            "probe_reason": next_turn.probe_reason,
+        }
+    )
+
+
+@student_required
+def viva_list(request):
+    sessions = VivaSession.objects.filter(student=request.user)
+    return render(request, "ai/viva_list.html", {"sessions": sessions})

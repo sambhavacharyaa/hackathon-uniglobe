@@ -66,3 +66,27 @@ class AnswerSheetUploadForm(forms.ModelForm):
         if image.size > MAX_ANSWER_SHEET_SIZE:
             raise forms.ValidationError("That image is too large — please keep it under 10MB.")
         return image
+
+
+class VivaStartForm(forms.Form):
+    topic = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={"placeholder": "e.g. Photosynthesis, or Python loops"}),
+        help_text="Whatever you want to be examined on.",
+    )
+    course = forms.ModelChoiceField(
+        queryset=None,
+        required=False,
+        empty_label="General knowledge (no specific course)",
+        help_text="Optional — grounds the examiner in that course's lessons.",
+    )
+
+    def __init__(self, *args, student=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        from courses.models import Course
+
+        self.fields["course"].queryset = Course.objects.filter(enrollments__student=student).distinct()
+
+
+class VivaAnswerForm(forms.Form):
+    answer = forms.CharField(widget=forms.Textarea(attrs={"rows": 3}))

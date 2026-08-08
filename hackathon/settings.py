@@ -193,3 +193,18 @@ OPENROUTER_MODEL = os.environ.get('OPENROUTER_MODEL', 'openai/gpt-oss-20b:free')
 # (accepts image_url content). Most text-only free models, including the
 # default above, cannot read images.
 OPENROUTER_VISION_MODEL = os.environ.get('OPENROUTER_VISION_MODEL', 'google/gemma-4-26b-a4b-it:free')
+
+
+# Make sure AI-call failures/warnings actually show up in the runserver
+# console instead of vanishing silently (no handler is attached to app
+# loggers by default) — useful for spotting a flaky AI response live.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler'},
+    },
+    'loggers': {
+        'ai': {'handlers': ['console'], 'level': 'INFO', 'propagate': False},
+    },
+}

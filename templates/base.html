@@ -78,6 +78,9 @@
                         <a href="{% url 'answer-sheet-list' %}" class="sidebar-link {% if url_name == 'answer-sheet-list' or url_name == 'answer-sheet-upload' or url_name == 'answer-sheet-detail' %}is-active{% endif %}">
                             Answer sheets
                         </a>
+                        <a href="{% url 'viva-list' %}" class="sidebar-link {% if url_name == 'viva-list' or url_name == 'viva-start' or url_name == 'viva-detail' %}is-active{% endif %}">
+                            AI Viva
+                        </a>
                         {% endwith %}
                     {% elif user.is_instructor %}
                         <a href="{% url 'dashboard' %}#my-courses" class="sidebar-link">
@@ -141,6 +144,43 @@
             </main>
         </div>
     </div>
+
+    <div class="ai-loading-overlay" id="ai-loading-overlay" aria-hidden="true" role="status" aria-live="polite">
+        <div class="ai-loading-box">
+            <div class="ai-loading-spinner" aria-hidden="true"></div>
+            <p class="ai-loading-text" id="ai-loading-text">Working…</p>
+            <p class="ai-loading-hint">This can take up to a minute on the free AI tier — please don't close this tab.</p>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            // Any form marked data-ai-loading="<message>" shows a full-page
+            // overlay the instant it's submitted, so a slow AI call (the free
+            // model tier can take 30-90s) never looks like a frozen page.
+            // The form submits normally — no fetch/preventDefault — the
+            // overlay just rides along until the next page replaces it.
+            var overlay = document.getElementById("ai-loading-overlay");
+            var overlayText = document.getElementById("ai-loading-text");
+            if (overlay) {
+                document.querySelectorAll("form[data-ai-loading]").forEach(function (form) {
+                    form.addEventListener("submit", function () {
+                        if (overlayText) overlayText.textContent = form.getAttribute("data-ai-loading") || "Working…";
+                        overlay.classList.add("is-visible");
+                        overlay.setAttribute("aria-hidden", "false");
+                    });
+                });
+                // Safety net: if the user navigates back to a page while the
+                // overlay was mid-flight (bfcache restore), don't leave it stuck.
+                window.addEventListener("pageshow", function (e) {
+                    if (e.persisted) {
+                        overlay.classList.remove("is-visible");
+                        overlay.setAttribute("aria-hidden", "true");
+                    }
+                });
+            }
+        })();
+    </script>
 
     <script>
         (function () {

@@ -105,6 +105,86 @@ class AnswerSheetReview(models.Model):
         return f"{self.subject} — {self.student.email} ({self.created_at:%Y-%m-%d})"
 
 
+class VivaSession(models.Model):
+    """An adaptive oral-exam (viva voce) session.
+
+    The AI asks an opening question on a topic, then for a few rounds reads
+    the student's latest answer and probes whatever was vague or
+    memorized-sounding about it — not a fixed question list. After the last
+    round it renders a verdict on whether the understanding looked genuine.
+    """
+
+    MAX_ROUNDS = 3
+
+    class Status(models.TextChoices):
+        IN_PROGRESS = "in_progress", "In progress"
+        COMPLETED = "completed", "Completed"
+
+    class Verdict(models.TextChoices):
+        STRONG = "strong", "Genuine understanding"
+        DEVELOPING = "developing", "Developing understanding"
+        ROTE = "rote", "Memorized, not understood"
+        WEAK = "weak", "Significant gaps"
+
+    student = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="viva_sessions"
+    )
+    course = models.ForeignKey(
+        "courses.Course", on_delete=models.SET_NULL, null=True, blank=True, related_name="viva_sessions"
+    )
+    topic = models.CharField(max_length=200)
+    status = models.CharField(max_length=12, choices=Status.choices, default=Status.IN_PROGRESS)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    # Filled in once the final round is graded.
+    verdict = models.CharField(max_length=12, choices=Verdict.choices, blank=True)
+    verdict_summary = models.TextField(blank=True)
+    strengths = models.JSONField(default=list, blank=True)
+    gaps = models.JSONField(default=list, blank=True)
+    suggestions = models.TextField(blank=True)
+
+    error = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Viva: {self.topic} — {self.student.email}"
+
+    @property
+    def is_completed(self):
+        return self.status == self.Status.COMPLETED
+
+    @property
+    def current_turn(self):
+        """The most recent turn — the one still awaiting an answer while in progress."""
+        return self.turns.order_by("-round_number").first()
+
+
+class VivaTurn(models.Model):
+    session = models.ForeignKey(VivaSession, on_delete=models.CASCADE, related_name="turns")
+    round_number = models.PositiveIntegerField()
+    question = models.TextField()
+    probe_reason = models.CharField(
+        max_length=200, blank=True, help_text="Why the AI is asking this — shown as a small hint."
+    )
+    answer = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    answered_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["round_number"]
+        unique_together = ("session", "round_number")
+
+    def __str__(self):
+        return f"Round {self.round_number}: {self.question[:50]}"
+
+    @property
+    def is_answered(self):
+        return bool(self.answered_at)
+
+
 class ChatThread(models.Model):
     """One AI doubt-solving conversation between a student and a course's assistant."""
 

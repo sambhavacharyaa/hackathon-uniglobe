@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}My vivas{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>AI Viva sessions</h1>
+        <p class="page-subtitle">Oral-exam-style practice, with an honest read on your understanding.</p>
+    </div>
+    <a href="{% url 'viva-start' %}" class="btn btn-primary">+ Start a viva</a>
+</div>
+
+{% if sessions %}
+    {% for s in sessions %}
+        <a href="{% url 'viva-detail' s.id %}" class="list-row" style="text-decoration:none; color:inherit;">
+            <div class="list-row-main">
+                <div class="avatar" style="font-size:1.1rem;">🎓</div>
+                <div>
+                    <div class="list-row-title">{{ s.topic }}</div>
+                    <div class="list-row-meta">
+                        {% if s.course %}{{ s.course.title }} &middot; {% endif %}{{ s.created_at|date:"M j, Y" }}
+                    </div>
+                </div>
+            </div>
+            {% if not s.is_completed %}
+                <span class="badge badge-warning">In progress</span>
+            {% elif s.error %}
+                <span class="badge badge-critical">Failed</span>
+            {% elif s.verdict == "strong" %}
+                <span class="badge badge-good">{{ s.get_verdict_display }}</span>
+            {% elif s.verdict == "developing" %}
+                <span class="badge badge-warning">{{ s.get_verdict_display }}</span>
+            {% else %}
+                <span class="badge badge-critical">{{ s.get_verdict_display }}</span>
+            {% endif %}
+        </a>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <p>You haven't taken a viva yet.</p>
+        <a href="{% url 'viva-start' %}" class="btn btn-primary btn-sm">Start your first viva</a>
+    </div>
+{% endif %}
+{% endblock %}

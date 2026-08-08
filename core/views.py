@@ -8,7 +8,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
-from ai.models import AnswerSheetReview, Marksheet
+from ai.models import AnswerSheetReview, Marksheet, VivaSession
 from core.content import get_landing_context
 from core.emails import send_otp_email
 from core.forms import ResendOTPForm, SignUpForm, OTPVerifyForm
@@ -140,6 +140,13 @@ MARKSHEET_BADGE_CLASS = {
     Marksheet.Status.PENDING: "badge-warning",
     Marksheet.Status.APPROVED: "badge-good",
     Marksheet.Status.REJECTED: "badge-critical",
+}
+
+VIVA_VERDICT_BADGE_CLASS = {
+    VivaSession.Verdict.STRONG: "badge-good",
+    VivaSession.Verdict.DEVELOPING: "badge-warning",
+    VivaSession.Verdict.ROTE: "badge-critical",
+    VivaSession.Verdict.WEAK: "badge-critical",
 }
 
 
@@ -422,6 +429,26 @@ def _student_dashboard(request):
                 "meta": "Answer sheet",
                 "url": reverse("answer-sheet-detail", args=[a.id]),
                 "timestamp": a.created_at,
+                "badge": badge,
+                "badge_class": bclass,
+            }
+        )
+    for v in VivaSession.objects.filter(student=user).order_by("-created_at")[:6]:
+        if not v.is_completed:
+            text, badge, bclass = f"Started a viva: {v.topic}", "In progress", "badge-warning"
+        elif v.error:
+            text, badge, bclass = f"Viva failed: {v.topic}", "Failed", "badge-critical"
+        else:
+            text = f"Finished a viva: {v.topic}"
+            badge = v.get_verdict_display()
+            bclass = VIVA_VERDICT_BADGE_CLASS.get(v.verdict, "badge-neutral")
+        activity.append(
+            {
+                "icon": "🎓",
+                "text": text,
+                "meta": v.course.title if v.course else "General knowledge",
+                "url": reverse("viva-detail", args=[v.id]),
+                "timestamp": v.completed_at or v.created_at,
                 "badge": badge,
                 "badge_class": bclass,
             }

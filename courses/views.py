@@ -2,11 +2,13 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from ai import llm
 from ai.models import ChatMessage, ChatThread, Marksheet
+from core.emails import send_assignment_posted_email, send_submission_received_email
 from courses.decorators import instructor_required, student_required
 from courses.forms import (
     AnnouncementForm,
@@ -184,7 +186,9 @@ def add_assignment(request, slug):
             assignment = form.save(commit=False)
             assignment.course = course
             assignment.save()
-            messages.success(request, f"Assignment “{assignment.title}” posted.")
+            link = request.build_absolute_uri(reverse("course-detail", args=[slug]))
+            send_assignment_posted_email(assignment, link=link)
+            messages.success(request, f"Assignment “{assignment.title}” posted. Enrolled students have been emailed.")
             return redirect("course-detail", slug=slug)
     else:
         form = AssignmentForm()
@@ -231,6 +235,10 @@ def submit_assignment(request, slug, assignment_id):
                 submission.content = form.cleaned_data["content"]
                 submission.submitted_at = timezone.now()
                 submission.save()
+            link = request.build_absolute_uri(
+                reverse("view-submissions", args=[slug, assignment.id])
+            )
+            send_submission_received_email(submission, link=link)
             messages.success(request, f"Submitted “{assignment.title}”.")
     return redirect("course-detail", slug=slug)
 

@@ -34,7 +34,7 @@
                             </div>
                             <div class="list-row-actions">
                                 <a href="{% url 'add-resource' course.slug lesson.id %}" class="btn btn-ghost btn-sm">+ Resource</a>
-                                <form method="post" action="{% url 'generate-quiz' course.slug lesson.id %}" class="inline-form">
+                                <form method="post" action="{% url 'generate-quiz' course.slug lesson.id %}" class="inline-form" data-ai-loading="AI is building your quiz…">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-ghost btn-sm">
                                         {% if lesson.quiz %}↻ Regenerate quiz{% else %}✨ Generate quiz{% endif %}

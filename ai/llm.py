@@ -91,12 +91,22 @@ def _generate_json(prompt, system_instruction=None, model=None):
         messages.append({"role": "system", "content": system_instruction})
     messages.append({"role": "user", "content": prompt})
 
-    text = _chat(messages, model=model)
-    try:
-        return _extract_json(text)
-    except (ValueError, TypeError) as exc:
-        logger.exception("OpenRouter returned invalid JSON: %r", text)
-        raise LLMError("The AI returned an unexpected response. Please try again.") from exc
+    # Free-tier models occasionally wrap the JSON in stray commentary or
+    # return something malformed one time in a while. That's a sampling
+    # fluke, not a systemic problem, so one silent retry with a fresh
+    # completion clears almost all of them before the user ever sees an
+    # error — cheap insurance against a flaky response mid-demo.
+    last_exc = None
+    for attempt in range(2):
+        text = _chat(messages, model=model)
+        try:
+            return _extract_json(text)
+        except (ValueError, TypeError) as exc:
+            last_exc = exc
+            logger.warning("OpenRouter returned invalid JSON on attempt %d: %r", attempt + 1, text)
+
+    logger.exception("OpenRouter returned invalid JSON after retry", exc_info=last_exc)
+    raise LLMError("The AI returned an unexpected response. Please try again.") from last_exc
 
 
 def review_marksheet(entries, student_name):
@@ -197,6 +207,74 @@ If the image is too unclear to read, say so honestly in "overall_feedback" and l
     except (ValueError, TypeError) as exc:
         logger.exception("OpenRouter returned invalid JSON for answer sheet: %r", text)
         raise LLMError("The AI returned an unexpected response. Please try again.") from exc
+
+
+def _viva_context_block(course):
+    if not course:
+        return ""
+    lesson_titles = ", ".join(course.lessons.values_list("title", flat=True)) or "(none yet)"
+    return f'\nThis viva is for the course "{course.title}". Lessons covered: {lesson_titles}.\n'
+
+
+def generate_viva_question(topic, course, transcript):
+    """Ask the opening question (transcript empty) or a targeted follow-up
+    that probes whatever was weak or vague in the student's latest answer.
+
+    transcript: list of {"question": str, "answer": str}, oldest first,
+    already includes the just-answered turn.
+    """
+    context = _viva_context_block(course)
+
+    if not transcript:
+        prompt = f"""You are an experienced oral examiner (viva voce) about to test a student's understanding of: {topic}.{context}
+Ask ONE clear, moderately challenging opening question. It should require the student to explain or apply the concept, not just recall a definition.
+
+Respond with ONLY a JSON object (no markdown fences, no extra text):
+{{"question": "your opening question"}}"""
+    else:
+        transcript_text = "\n\n".join(
+            f"Q{i + 1}: {t['question']}\nStudent's answer: {t['answer']}" for i, t in enumerate(transcript)
+        )
+        prompt = f"""You are an experienced oral examiner (viva voce) probing a student's understanding of: {topic}.{context}
+
+Conversation so far:
+{transcript_text}
+
+You are not grading yet — you are probing. Look closely at the student's MOST RECENT answer:
+- If it was vague, incomplete, hedged, or sounds like a memorized definition rather than real understanding, ask a targeted follow-up that goes straight at that specific weakness: ask them to apply the idea to a new situation, explain the reasoning behind a claim they made, define a term they used loosely, or resolve an apparent contradiction.
+- If the answer was genuinely strong, don't just move on to an unrelated question — push a level deeper: a harder edge case, a "what if" that tests the boundary of the same idea.
+- Never ask something already covered above, and don't just reword the previous question.
+
+Respond with ONLY a JSON object (no markdown fences, no extra text):
+{{"question": "your follow-up question", "probe_reason": "one short phrase, e.g. 'answer was vague about why, not just what'"}}"""
+
+    return _generate_json(prompt)
+
+
+def generate_viva_verdict(topic, course, transcript):
+    """Final read on the whole exchange: genuine understanding vs. rote
+    recall, once every round has been answered."""
+    context = _viva_context_block(course)
+    transcript_text = "\n\n".join(
+        f"Q{i + 1}: {t['question']}\nStudent's answer: {t['answer']}" for i, t in enumerate(transcript)
+    )
+    prompt = f"""You are an experienced oral examiner (viva voce) who has just finished questioning a student on: {topic}.{context}
+
+Full exchange:
+{transcript_text}
+
+Give your honest verdict on whether this student genuinely understands {topic}, or whether they are reciting memorized material without real comprehension. Base this on how their answers held up under follow-up questioning — understanding that survives probing is real; understanding that collapses into vagueness under a follow-up usually is not.
+
+Respond with ONLY a JSON object (no markdown fences, no extra text) of this exact shape:
+{{
+  "verdict": "strong" | "developing" | "rote" | "weak",
+  "verdict_label": "a short human label for the verdict, e.g. \\"Genuine understanding\\" or \\"Memorized, not understood\\"",
+  "summary": "2-3 sentence overall assessment referencing specifically how they responded to the follow-ups",
+  "strengths": ["short phrase", "short phrase"],
+  "gaps": ["short phrase describing a specific gap exposed by a follow-up", "short phrase"],
+  "suggestions": "a specific, actionable paragraph on what to actually study or practice next, based on the gaps found"
+}}"""
+    return _generate_json(prompt)
 
 
 def chat_reply(course, history, message):
