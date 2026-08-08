@@ -1,0 +1,13 @@
+{% comment %}
+  Custom cursor.
+
+  Mounted only on fine-pointer devices (index.js adds `has-cursor` after a
+  `(pointer: fine)` check) and hidden outright at `(hover: none)`. The native
+  cursor is never set to `none`, so if the script dies mid-session the visitor
+  still has a working pointer.
+{% endcomment %}
+<div class="cursor" data-cursor aria-hidden="true">
+  <div class="cursor__ring"></div>
+  <div class="cursor__dot"></div>
+  <span class="cursor__label" data-cursor-label></span>
+</div>

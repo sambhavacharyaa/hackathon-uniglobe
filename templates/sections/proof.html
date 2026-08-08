@@ -1,0 +1,31 @@
+{% comment %}
+  Proof strip. Two counter-scrolling marquees. Each track is duplicated in the
+  markup because a -50% translate loop needs two identical halves to appear
+  seamless; the clone is aria-hidden so the names are announced once.
+{% endcomment %}
+<section class="proof" aria-label="Built with">
+  <div class="shell shell--wide">
+    <p class="proof__label">Built with</p>
+
+    <div class="marquee">
+      <div class="marquee__track">
+        {% for item in marquee_items %}
+          <span class="marquee__item">
+            <svg aria-hidden="true"><use href="#i-terminal"></use></svg>
+            {{ item }}
+          </span>
+          <span class="marquee__sep" aria-hidden="true"></span>
+        {% endfor %}
+      </div>
+      <div class="marquee__track" aria-hidden="true">
+        {% for item in marquee_items %}
+          <span class="marquee__item">
+            <svg aria-hidden="true"><use href="#i-terminal"></use></svg>
+            {{ item }}
+          </span>
+          <span class="marquee__sep"></span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

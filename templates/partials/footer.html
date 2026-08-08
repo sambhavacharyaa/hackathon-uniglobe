@@ -1,0 +1,57 @@
+{% comment %}
+  Footer. Four link columns plus a brand block, and an oversized outlined
+  wordmark that bleeds off the bottom of the page.
+{% endcomment %}
+<footer class="footer">
+  <div class="footer__glow" aria-hidden="true"></div>
+
+  <div class="shell">
+    <div class="footer__grid">
+
+      <div class="footer__brand">
+        <a class="logo" href="#top" data-magnetic>
+          <span class="logo__mark">
+            <svg aria-hidden="true"><use href="#i-logo"></use></svg>
+          </span>
+          <span class="logo__text">
+            <b>Skill</b><span>Up</span>
+            <i class="logo__dot" aria-hidden="true"></i>
+          </span>
+        </a>
+        <p class="t-small">
+          A course platform with four AI tools built in — marksheet review, quiz
+          generation, a doubt-solving chat assistant, and resource-rich lessons.
+        </p>
+        <p class="t-micro">
+          Built with Django and OpenRouter for the Uniglobe Hackathon.
+        </p>
+        <div class="footer__socials">
+          <a class="social" href="https://github.com/sambhavacharyaa/hackathon-uniglobe" aria-label="Skill Up on GitHub" data-magnetic>
+            <svg aria-hidden="true"><use href="#i-github"></use></svg>
+          </a>
+        </div>
+      </div>
+
+      {% for col in footer_columns %}
+        <div>
+          <p class="footer__col-title">{{ col.title }}</p>
+          <ul class="footer__links">
+            {% for link in col.links %}
+              <li><a class="footer__link" href="{{ link.href }}">{{ link.label }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+
+    </div>
+
+    <div class="footer__bottom">
+      <p>© {{ current_year }} {{ SITE_NAME }}. Built for Uniglobe Hackathon.</p>
+      <p class="row row--tight">
+        <span class="badge badge--live"><i class="badge__dot"></i> All systems nominal</span>
+      </p>
+    </div>
+
+    <p class="footer__wordmark" aria-hidden="true">SKILL UP</p>
+  </div>
+</footer>

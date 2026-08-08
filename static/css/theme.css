@@ -1,167 +1,89 @@
 /*
- * Design tokens — the ONE file to edit to re-theme the whole app.
- * Every color, spacing, radius, and shadow elsewhere in the app is
- * defined in terms of these custom properties. Swap the values below
- * (e.g. --color-primary) and the whole UI follows.
+ * Design tokens for the app (dashboards, auth, courses, AI features).
+ *
+ * This imports the SAME token system the landing page uses (tokens.css) and
+ * then aliases a small, stable set of semantic names onto it — so the whole
+ * app shares one visual identity with the marketing site, and a rebrand is
+ * still a matter of editing tokens.css in one place.
  */
+@import url("tokens.css");
 
 :root {
-    color-scheme: light;
+    /* --- Brand / accent (aliased onto the violet ramp) ---------------------- */
+    --color-primary: var(--brand);
+    --color-primary-hover: var(--violet-400);
+    --color-primary-soft: var(--brand-wash);
+    --color-primary-contrast: var(--brand-ink);
 
-    /* --- Brand / accent ------------------------------------------------ */
-    --color-primary: #2a78d6;
-    --color-primary-hover: #1c5cab;
-    --color-primary-soft: #cde2fb;
-    --color-primary-contrast: #ffffff;
+    /* --- Role accents (student = cyan, instructor = violet) ------------------ */
+    --color-role-student: var(--accent-cyan);
+    --color-role-student-soft: var(--accent-cyan-wash);
+    --color-role-instructor: var(--brand-soft);
+    --color-role-instructor-soft: var(--brand-wash);
 
-    /* --- Role accents (student vs instructor) --------------------------- */
-    --color-role-student: #2a78d6;
-    --color-role-student-soft: #cde2fb;
-    --color-role-instructor: #4a3aa7;
-    --color-role-instructor-soft: #e4e1f9;
+    /* --- Surfaces -------------------------------------------------------------- */
+    --color-bg: var(--bg);
+    --color-surface: var(--glass-bg);
+    --color-surface-raised: var(--surface-solid);
+    --color-surface-sunken: var(--surface-sunken);
+    --color-border: var(--glass-border);
+    --color-border-strong: var(--line-strong);
 
-    /* --- Surfaces -------------------------------------------------------- */
-    --color-bg: #f9f9f7;
-    --color-surface: #fcfcfb;
-    --color-surface-raised: #ffffff;
-    --color-border: rgba(11, 11, 11, 0.10);
-    --color-border-strong: rgba(11, 11, 11, 0.16);
+    /* --- Ink --------------------------------------------------------------------- */
+    --color-text: var(--text);
+    --color-text-secondary: var(--text-muted);
+    --color-text-muted: var(--text-dim);
+    --color-text-on-primary: var(--brand-ink);
 
-    /* --- Ink --------------------------------------------------------------- */
-    --color-text: #0b0b0b;
-    --color-text-secondary: #52514e;
-    --color-text-muted: #898781;
-    --color-text-on-primary: #ffffff;
+    /* --- Status (fixed meaning) --------------------------------------------------- */
+    --color-good: var(--ok);
+    --color-good-soft: var(--accent-emerald-wash);
+    --color-warning: var(--warn);
+    --color-warning-soft: var(--accent-amber-wash);
+    --color-serious: var(--accent-amber);
+    --color-serious-soft: var(--accent-amber-wash);
+    --color-critical: var(--bad);
+    --color-critical-soft: var(--accent-rose-wash);
 
-    /* --- Status (fixed meaning — do not repurpose) ------------------------- */
-    --color-good: #0ca30c;
-    --color-good-soft: #d9f3d9;
-    --color-warning: #c98500;
-    --color-warning-soft: #fbe8c2;
-    --color-serious: #ec835a;
-    --color-serious-soft: #fbe0d4;
-    --color-critical: #d03b3b;
-    --color-critical-soft: #f8d7d7;
+    /* --- Sequential (progress meters) ---------------------------------------------- */
+    --color-meter-track: var(--surface-sunken);
+    --color-meter-fill: var(--brand);
 
-    /* --- Sequential (progress meters) --------------------------------------- */
-    --color-meter-track: #e1e0d9;
-    --color-meter-fill: #2a78d6;
+    /* --- Spacing scale (aliased onto the fluid --sp-* scale) ------------------------ */
+    --space-1: var(--sp-3xs);
+    --space-2: var(--sp-xs);
+    --space-3: var(--sp-sm);
+    --space-4: var(--sp-md);
+    --space-5: var(--sp-lg);
+    --space-6: var(--sp-xl);
+    --space-7: var(--sp-2xl);
+    --space-8: var(--sp-3xl);
 
-    /* --- Spacing scale ------------------------------------------------------- */
-    --space-1: 4px;
-    --space-2: 8px;
-    --space-3: 12px;
-    --space-4: 16px;
-    --space-5: 24px;
-    --space-6: 32px;
-    --space-7: 48px;
-    --space-8: 64px;
+    /* --- Radius ---------------------------------------------------------------------- */
+    --radius-sm: var(--r-sm);
+    --radius-md: var(--r-md);
+    --radius-lg: var(--r-xl);
+    --radius-full: var(--r-pill);
+    --radius-input: var(--r-lg);
 
-    /* --- Radius ---------------------------------------------------------------- */
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 16px;
-    --radius-full: 999px;
+    /* --- Shadow / glow ----------------------------------------------------------------- */
+    --shadow-sm: var(--shadow-sm);
+    --shadow-md: var(--shadow-md);
+    --shadow-lg: var(--shadow-lg);
+    --glow-primary: var(--glow-brand);
 
-    /* --- Shadow ------------------------------------------------------------------ */
-    --shadow-sm: 0 1px 2px rgba(11, 11, 11, 0.06);
-    --shadow-md: 0 4px 12px rgba(11, 11, 11, 0.08);
-    --shadow-lg: 0 12px 32px rgba(11, 11, 11, 0.14);
-
-    /* --- Typography ---------------------------------------------------------------- */
-    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --text-xs: 0.75rem;
-    --text-sm: 0.875rem;
-    --text-base: 1rem;
-    --text-lg: 1.125rem;
-    --text-xl: 1.5rem;
-    --text-2xl: 2rem;
+    /* --- Typography ------------------------------------------------------------------- */
+    --font-sans: var(--font-body);
+    --font-display: var(--font-display);
+    --font-mono: var(--font-mono);
+    --text-xs: var(--fs-xs);
+    --text-sm: var(--fs-sm);
+    --text-base: var(--fs-base);
+    --text-lg: var(--fs-lg);
+    --text-xl: var(--fs-xl);
+    --text-2xl: var(--fs-2xl);
 
     /* --- Motion --------------------------------------------------------------------- */
-    --transition-fast: 120ms ease;
-    --transition-base: 200ms ease;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-        color-scheme: dark;
-
-        --color-primary: #3987e5;
-        --color-primary-hover: #5598e7;
-        --color-primary-soft: #184f95;
-        --color-primary-contrast: #ffffff;
-
-        --color-role-student: #3987e5;
-        --color-role-student-soft: #184f95;
-        --color-role-instructor: #9085e9;
-        --color-role-instructor-soft: #322a63;
-
-        --color-bg: #0d0d0d;
-        --color-surface: #1a1a19;
-        --color-surface-raised: #232322;
-        --color-border: rgba(255, 255, 255, 0.10);
-        --color-border-strong: rgba(255, 255, 255, 0.18);
-
-        --color-text: #ffffff;
-        --color-text-secondary: #c3c2b7;
-        --color-text-muted: #898781;
-        --color-text-on-primary: #ffffff;
-
-        --color-good: #0ca30c;
-        --color-good-soft: #143d14;
-        --color-warning: #fab219;
-        --color-warning-soft: #4a3a10;
-        --color-serious: #ec835a;
-        --color-serious-soft: #4a2c1e;
-        --color-critical: #e66767;
-        --color-critical-soft: #4a1f1f;
-
-        --color-meter-track: #2c2c2a;
-        --color-meter-fill: #3987e5;
-
-        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-        --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
-    }
-}
-
-:root[data-theme="dark"] {
-    color-scheme: dark;
-
-    --color-primary: #3987e5;
-    --color-primary-hover: #5598e7;
-    --color-primary-soft: #184f95;
-    --color-primary-contrast: #ffffff;
-
-    --color-role-student: #3987e5;
-    --color-role-student-soft: #184f95;
-    --color-role-instructor: #9085e9;
-    --color-role-instructor-soft: #322a63;
-
-    --color-bg: #0d0d0d;
-    --color-surface: #1a1a19;
-    --color-surface-raised: #232322;
-    --color-border: rgba(255, 255, 255, 0.10);
-    --color-border-strong: rgba(255, 255, 255, 0.18);
-
-    --color-text: #ffffff;
-    --color-text-secondary: #c3c2b7;
-    --color-text-muted: #898781;
-    --color-text-on-primary: #ffffff;
-
-    --color-good: #0ca30c;
-    --color-good-soft: #143d14;
-    --color-warning: #fab219;
-    --color-warning-soft: #4a3a10;
-    --color-serious: #ec835a;
-    --color-serious-soft: #4a2c1e;
-    --color-critical: #e66767;
-    --color-critical-soft: #4a1f1f;
-
-    --color-meter-track: #2c2c2a;
-    --color-meter-fill: #3987e5;
-
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+    --transition-fast: var(--d-fast) var(--ease-out);
+    --transition-base: var(--d-base) var(--ease-out);
 }

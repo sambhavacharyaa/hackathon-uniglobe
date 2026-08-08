@@ -1,0 +1,120 @@
+{% comment %}
+  Command palette (Ctrl/Cmd + K).
+
+  Items are declared in the markup rather than built in JS so the list is
+  crawlable, works without a fetch, and stays in step with the page's real
+  anchors. index.js handles filtering, arrow-key navigation and Enter.
+{% endcomment %}
+<div class="palette" data-palette role="dialog" aria-modal="true" aria-label="Quick jump">
+  <div class="palette__panel">
+
+    <div class="palette__search">
+      <svg aria-hidden="true"><use href="#i-search"></use></svg>
+      <input class="palette__input" type="text" data-palette-input
+             placeholder="Jump to a section, or type a word…"
+             aria-label="Search sections" autocomplete="off" spellcheck="false">
+      <button class="btn-icon" type="button" data-palette-close aria-label="Close">
+        <svg aria-hidden="true"><use href="#i-close"></use></svg>
+      </button>
+    </div>
+
+    <div class="palette__list" data-palette-list role="listbox" aria-label="Sections">
+      <p class="palette__group-title">Sections</p>
+
+      <button class="palette__item" type="button" role="option" data-palette-item data-target="#problem"
+              data-keywords="problem gradebook score why unit reteach">
+        <svg aria-hidden="true"><use href="#i-alert"></use></svg>
+        <span>The problem with a score</span>
+        <span class="palette__item-hint">Section</span>
+      </button>
+
+      <button class="palette__item" type="button" role="option" data-palette-item data-target="#diagnosis"
+              data-keywords="diagnosis demo live evidence confidence quiz student">
+        <svg aria-hidden="true"><use href="#i-search-doc"></use></svg>
+        <span>Live quiz insight demo</span>
+        <span class="palette__item-hint">Interactive</span>
+      </button>
+
+      <button class="palette__item" type="button" role="option" data-palette-item data-target="#capabilities"
+              data-keywords="capabilities chat tutor quiz marksheet lessons features ai">
+        <svg aria-hidden="true"><use href="#i-layers"></use></svg>
+        <span>The four capabilities</span>
+        <span class="palette__item-hint">Section</span>
+      </button>
+
+      <button class="palette__item" type="button" role="option" data-palette-item data-target="#pipeline"
+              data-keywords="pipeline how it works sign up enrol steps">
+        <svg aria-hidden="true"><use href="#i-activity"></use></svg>
+        <span>How it works</span>
+        <span class="palette__item-hint">Section</span>
+      </button>
+
+      <button class="palette__item" type="button" role="option" data-palette-item data-target="#engine"
+              data-keywords="engine model openrouter routing pricing latency">
+        <svg aria-hidden="true"><use href="#i-cpu"></use></svg>
+        <span>Under the hood</span>
+        <span class="palette__item-hint">Section</span>
+      </button>
+
+      <button class="palette__item" type="button" role="option" data-palette-item data-target="#numbers"
+              data-keywords="numbers stats features">
+        <svg aria-hidden="true"><use href="#i-target"></use></svg>
+        <span>The numbers</span>
+        <span class="palette__item-hint">Section</span>
+      </button>
+
+      <button class="palette__item" type="button" role="option" data-palette-item data-target="#voices"
+              data-keywords="principles design why voices">
+        <svg aria-hidden="true"><use href="#i-quote"></use></svg>
+        <span>Design principles</span>
+        <span class="palette__item-hint">Section</span>
+      </button>
+
+      <button class="palette__item" type="button" role="option" data-palette-item data-target="#pricing"
+              data-keywords="pricing plans cost free self-hosted school">
+        <svg aria-hidden="true"><use href="#i-graduation"></use></svg>
+        <span>Pricing</span>
+        <span class="palette__item-hint">Section</span>
+      </button>
+
+      <button class="palette__item" type="button" role="option" data-palette-item data-target="#faq"
+              data-keywords="faq questions answers openrouter security login">
+        <svg aria-hidden="true"><use href="#i-info"></use></svg>
+        <span>Frequently asked</span>
+        <span class="palette__item-hint">Section</span>
+      </button>
+
+      <p class="palette__group-title">Actions</p>
+
+      <button class="palette__item" type="button" role="option" data-palette-item data-action="theme"
+              data-keywords="theme dark light mode toggle appearance colour color">
+        <svg aria-hidden="true"><use href="#i-moon"></use></svg>
+        <span>Toggle dark / light theme</span>
+        <span class="palette__item-hint">Action</span>
+      </button>
+
+      <button class="palette__item" type="button" role="option" data-palette-item data-action="rerun"
+              data-keywords="rerun diagnosis replay demo again analysis">
+        <svg aria-hidden="true"><use href="#i-refresh"></use></svg>
+        <span>Re-run the diagnosis demo</span>
+        <span class="palette__item-hint">Action</span>
+      </button>
+
+      <button class="palette__item" type="button" role="option" data-palette-item data-action="top"
+              data-keywords="top home hero beginning start">
+        <svg aria-hidden="true"><use href="#i-arrow-up"></use></svg>
+        <span>Back to the top</span>
+        <span class="palette__item-hint">Action</span>
+      </button>
+
+      <p class="palette__empty u-hide" data-palette-empty>Nothing matches that.</p>
+    </div>
+
+    <div class="palette__foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span><kbd>↵</kbd> select</span>
+      <span><kbd>esc</kbd> close</span>
+    </div>
+
+  </div>
+</div>

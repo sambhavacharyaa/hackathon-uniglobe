@@ -1,0 +1,90 @@
+{% comment %}
+  Pricing. Both the monthly and yearly figures are rendered into data
+  attributes up front, so the billing switch is an attribute read rather than
+  a lookup table in JS — and the correct price is on the page before any
+  script runs.
+{% endcomment %}
+<section class="section" id="pricing">
+  <div class="shell shell--wide">
+
+    <header class="section__head section__head--center" data-reveal>
+      <span class="eyebrow eyebrow--center">Pricing</span>
+      <h2 class="t-h2">Open source, free to self-host</h2>
+      <p class="t-lede u-center">
+        Run the full Django app yourself for nothing, forever — bring your own
+        OpenRouter key. Want us to host it for your school instead? Let's talk.
+      </p>
+    </header>
+
+    <div class="pricing__switch" data-reveal>
+      <div class="switch" role="tablist" aria-label="Billing period" data-billing>
+        <span class="switch__thumb" data-billing-thumb aria-hidden="true"></span>
+        <button class="switch__opt is-active" type="button" role="tab"
+                aria-selected="true" data-billing-opt="monthly">Monthly</button>
+        <button class="switch__opt" type="button" role="tab"
+                aria-selected="false" data-billing-opt="yearly">
+          Yearly<span class="pricing__save">−20%</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="plans">
+      {% for p in pricing %}
+        <article class="plan"
+                 data-accent="{{ p.accent }}"
+                 data-featured="{% if p.featured %}true{% else %}false{% endif %}"
+                 data-reveal>
+
+          {% if p.badge %}
+            <span class="badge badge--accent plan__badge">{{ p.badge }}</span>
+          {% endif %}
+
+          <div class="stack stack-xs">
+            <h3 class="plan__name">{{ p.name }}</h3>
+            <p class="plan__tagline">{{ p.tagline }}</p>
+          </div>
+
+          <div class="plan__price">
+            {% if p.price_monthly == None %}
+              <span class="plan__amount">Custom</span>
+            {% else %}
+              <span class="plan__amount"
+                    data-price
+                    data-monthly="{{ p.price_monthly }}"
+                    data-yearly="{{ p.price_yearly }}">${{ p.price_monthly }}</span>
+            {% endif %}
+            <span class="plan__unit">{{ p.price_note }}</span>
+          </div>
+
+          <span class="plan__divider" aria-hidden="true"></span>
+
+          <ul class="ticklist">
+            {% for f in p.features %}
+              <li class="is-yes">
+                <svg aria-hidden="true"><use href="#i-check"></use></svg>
+                <span>{{ f }}</span>
+              </li>
+            {% endfor %}
+            {% for f in p.absent %}
+              <li class="is-no">
+                <svg aria-hidden="true"><use href="#i-minus"></use></svg>
+                <span>{{ f }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+
+          <a class="btn plan__cta btn--block {% if p.featured %}btn--primary{% else %}btn--outline{% endif %}"
+             href="#cta" data-magnetic data-ripple>
+            {% if p.featured %}<span class="btn__sheen" aria-hidden="true"></span>{% endif %}
+            <span class="btn__label">
+              {{ p.cta }}
+              <svg aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+            </span>
+          </a>
+
+        </article>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>

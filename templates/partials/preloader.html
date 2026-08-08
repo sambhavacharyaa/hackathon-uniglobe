@@ -1,0 +1,18 @@
+{% comment %}
+  Preloader.
+
+  Shown only when JavaScript is running (index.js is what removes it, and
+  `html.no-js .preloader { display: none }` hides it otherwise, so it can
+  never trap a visitor). A hard 2.6s timeout in index.js dismisses it even if
+  an asset never resolves.
+{% endcomment %}
+<div class="preloader" data-preloader role="status" aria-live="polite">
+  <div class="preloader__inner">
+    <svg class="preloader__glyph" viewBox="0 0 64 64" aria-hidden="true"><use href="#i-glyph"></use></svg>
+    <p class="preloader__word">Skill<span class="u-accent">Up</span></p>
+    <div class="preloader__bar">
+      <div class="preloader__fill" data-preloader-fill></div>
+    </div>
+    <p class="preloader__status" data-preloader-status>Loading Skill Up</p>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+{% comment %}
+  Mobile drawer. Focus is trapped while open and returned to the burger on
+  close; Escape and any link click both dismiss it.
+{% endcomment %}
+<div class="drawer" id="drawer" data-drawer role="dialog" aria-modal="true" aria-label="Site menu">
+
+  <div class="row row--between">
+    <span class="eyebrow">Navigate</span>
+    <button class="btn-icon" type="button" data-drawer-close aria-label="Close menu">
+      <svg aria-hidden="true"><use href="#i-close"></use></svg>
+    </button>
+  </div>
+
+  <div class="drawer__links">
+    {% for link in nav_links %}
+      <a class="drawer__link" href="{{ link.href }}" data-drawer-link>
+        <span>{{ link.label }}</span>
+        <span class="drawer__hint">{{ link.hint }}</span>
+      </a>
+    {% endfor %}
+    <a class="drawer__link" href="#faq" data-drawer-link>
+      <span>FAQ</span>
+      <span class="drawer__hint">Eight honest answers</span>
+    </a>
+  </div>
+
+  <div class="drawer__foot">
+    <a class="btn btn--primary btn--block btn--lg" href="{% url 'register' %}" data-drawer-link data-ripple>
+      <span class="btn__sheen" aria-hidden="true"></span>
+      <span class="btn__label">Sign up free
+        <svg aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+      </span>
+    </a>
+    <a class="btn btn--ghost btn--block" href="{% url 'login' %}" data-drawer-link>
+      <span class="btn__label">Log in</span>
+    </a>
+    <p class="t-micro u-center">Free to self-host. No card required.</p>
+  </div>
+
+</div>

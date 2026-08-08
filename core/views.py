@@ -8,10 +8,17 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
+from core.content import get_landing_context
 from core.emails import send_otp_email
 from core.forms import ResendOTPForm, SignUpForm, OTPVerifyForm
 from core.models import User
 from courses.models import Announcement, Assignment, Course, Enrollment, Submission
+
+
+def landing(request):
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+    return render(request, "landing.html", get_landing_context())
 
 
 def register(request):

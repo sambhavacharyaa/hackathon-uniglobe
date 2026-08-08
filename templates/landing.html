@@ -1,0 +1,62 @@
+{% extends 'landing_base.html' %}
+{% load static %}
+
+{% comment %}
+  Skill Up landing page.
+
+  Section order follows the "Hero + Features + CTA" landing pattern with a
+  problem statement inserted before the solution — the argument only lands if
+  the reader feels the gap first:
+
+      hero          the claim
+      proof         who is already using it
+      problem       what a gradebook cannot tell you
+      diagnosis     the same data, read properly  (the interactive centrepiece)
+      capabilities  the four systems
+      pipeline      how it actually works
+      engine        model routing and cost
+      numbers       measured results
+      voices        teachers
+      pricing       the ask
+      faq           the objections
+      cta           the close
+{% endcomment %}
+
+{% block content %}
+
+  {% include 'sections/hero.html' %}
+  {% include 'sections/proof.html' %}
+  {% include 'sections/problem.html' %}
+
+  <div class="shell"><hr class="section__rule"></div>
+
+  {% include 'sections/diagnosis.html' %}
+  {% include 'sections/capabilities.html' %}
+
+  <div class="shell"><hr class="section__rule"></div>
+
+  {% include 'sections/pipeline.html' %}
+  {% include 'sections/engine.html' %}
+  {% include 'sections/numbers.html' %}
+  {% include 'sections/voices.html' %}
+
+  <div class="shell"><hr class="section__rule"></div>
+
+  {% include 'sections/pricing.html' %}
+  {% include 'sections/faq.html' %}
+  {% include 'sections/cta.html' %}
+
+{% endblock %}
+
+{% block extra_js %}
+  {% comment %}
+    Data island for the interactive demo.
+
+    `json_script` emits `<script type="application/json" id="demo-data">` with
+    every `<`, `>` and `&` escaped as unicode, so nothing in core/content.py
+    can break out of the tag into executable JavaScript. index.js reads it with
+    JSON.parse inside a try/catch and falls back to the server-rendered markup
+    if it is missing.
+  {% endcomment %}
+  {{ demo_students|json_script:"demo-data" }}
+{% endblock %}

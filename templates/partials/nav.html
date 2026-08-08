@@ -1,0 +1,63 @@
+{% comment %}
+  Floating navigation bar.
+
+  Inset from every edge rather than pinned flush to the top (the floating
+  navbar rule in the UX guidelines), condenses on scroll, hides on scroll-down
+  and returns on scroll-up. The sliding pill behind the links is positioned by
+  index.js from real element geometry, so it stays correct at any font size.
+{% endcomment %}
+<header class="nav" data-nav>
+  <nav class="nav__inner" aria-label="Primary">
+
+    <a class="logo" href="#top" data-magnetic data-cursor="top">
+      <span class="logo__mark">
+        <svg aria-hidden="true"><use href="#i-logo"></use></svg>
+      </span>
+      <span class="logo__text">
+        <b>Skill</b><span>Up</span>
+        <i class="logo__dot" aria-hidden="true"></i>
+      </span>
+      <span class="u-sr">{{ SITE_NAME }} home</span>
+    </a>
+
+    <div class="nav__links" data-nav-links>
+      <span class="nav__pill" data-nav-pill aria-hidden="true"></span>
+      {% for link in nav_links %}
+        <a class="nav__link" href="{{ link.href }}" data-nav-link>{{ link.label }}</a>
+      {% endfor %}
+    </div>
+
+    <div class="nav__actions">
+      <button class="kbd-hint" type="button" data-palette-open aria-label="Open the quick jump menu">
+        <svg aria-hidden="true"><use href="#i-search"></use></svg>
+        <span>Jump</span>
+        {# index.js rewrites this to the Command glyph on macOS. #}
+        <kbd data-mod-key>Ctrl</kbd><kbd>K</kbd>
+      </button>
+
+      <button class="theme-toggle" type="button" data-theme-toggle
+              aria-label="Switch between dark and light theme" aria-pressed="false">
+        <span class="theme-toggle__knob">
+          <svg class="theme-toggle__icon--moon" aria-hidden="true"><use href="#i-moon"></use></svg>
+          <svg class="theme-toggle__icon--sun" aria-hidden="true"><use href="#i-sun"></use></svg>
+        </span>
+      </button>
+
+      <a class="nav__link" href="{% url 'login' %}">Log in</a>
+
+      <a class="btn btn--primary btn--sm" href="{% url 'register' %}" data-magnetic data-ripple>
+        <span class="btn__sheen" aria-hidden="true"></span>
+        <span class="btn__label">
+          <span class="nav__cta-label">Sign up free</span>
+          <svg aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+        </span>
+      </a>
+
+      <button class="btn-icon nav__burger" type="button" data-drawer-open
+              aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+        <svg aria-hidden="true"><use href="#i-menu"></use></svg>
+      </button>
+    </div>
+
+  </nav>
+</header>

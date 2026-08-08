@@ -1,0 +1,80 @@
+{% comment %}
+  Model routing and the three engineering notes that go with it.
+
+  Three model tiers, each with its real API id, its rate, and the jobs routed
+  to it. The thin bar along the bottom edge of each card is that model's share
+  of total calls, which is the answer to "why three models?" in one glance.
+{% endcomment %}
+<section class="section" id="engine">
+  <div class="shell shell--wide">
+
+    <header class="section__head" data-reveal>
+      <span class="eyebrow">Under the hood</span>
+      <h2 class="t-h2">One model, swappable in a single line</h2>
+      <p class="t-lede">
+        Every AI feature goes through one OpenRouter client. It ships pointed at a
+        free-tier model, and switching to any other OpenRouter-hosted model — GPT,
+        Claude, Gemini, Llama — is one environment variable, not a code change.
+      </p>
+    </header>
+
+    <div class="engine__layout">
+
+      <div class="router">
+        {% for m in engine_models %}
+          <article class="model"
+                   data-accent="{{ m.accent }}"
+                   data-featured="{% if m.featured %}true{% else %}false{% endif %}"
+                   data-reveal>
+            <span class="model__tier" aria-hidden="true">
+              <svg>
+                <use href="{% if m.tier == 'fast' %}#i-zap{% elif m.tier == 'balanced' %}#i-chat{% else %}#i-brain{% endif %}"></use>
+              </svg>
+            </span>
+
+            <div class="model__meta">
+              <h3 class="model__name">
+                {{ m.name }}
+                <span class="badge badge--accent">{{ m.tier }}</span>
+              </h3>
+              <span class="model__id">{{ m.model_id }}</span>
+              <span class="t-micro">{{ m.context }}</span>
+              <div class="model__jobs">
+                {% for job in m.jobs %}
+                  <span class="chip">{{ job }}</span>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="model__price">
+              <span class="model__price-val">{{ m.price_in }} → {{ m.price_out }}</span>
+              <span class="model__price-unit">per MTok in → out</span>
+              <span class="model__price-unit">{{ m.share }}% of calls</span>
+            </div>
+
+            <span class="model__share" aria-hidden="true" style="--share: {{ m.share }}"></span>
+          </article>
+        {% endfor %}
+
+        <p class="t-micro">
+          The default model costs nothing to run — browse paid alternatives any time
+          at openrouter.ai/models if a class needs more headroom.
+        </p>
+      </div>
+
+      <div class="engine__notes">
+        {% for note in engine_notes %}
+          <article class="enote" data-reveal>
+            <div class="enote__stat">
+              <span class="enote__stat-val">{{ note.stat }}</span>
+              <span class="enote__stat-label">{{ note.stat_label }}</span>
+            </div>
+            <h3 class="enote__title">{{ note.title }}</h3>
+            <p class="enote__body">{{ note.body }}</p>
+          </article>
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+</section>

@@ -1,0 +1,20 @@
+{% comment %}
+  Numbers strip. Values count up once, when the strip first scrolls into view.
+  The final value is present in the markup as the element's text, so with JS
+  off the correct number is simply shown.
+{% endcomment %}
+<section class="section section--tight" id="numbers">
+  <div class="shell shell--wide">
+    <div class="numbers" data-reveal>
+      {% for n in numbers %}
+        <div class="number" data-accent="{{ n.accent }}">
+          <span class="number__val">
+            <span data-count-to="{{ n.value }}">{{ n.value }}</span>
+            {% if n.suffix %}<span class="number__suffix">{{ n.suffix }}</span>{% endif %}
+          </span>
+          <span class="number__label">{{ n.label }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

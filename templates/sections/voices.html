@@ -1,0 +1,41 @@
+{% comment %}
+  Teacher testimonials. Four cards on a two-column grid — no carousel, because
+  a carousel hides three quarters of your social proof behind an interaction
+  nobody performs.
+{% endcomment %}
+<section class="section" id="voices">
+  <div class="shell">
+
+    <header class="section__head section__head--center" data-reveal>
+      <span class="eyebrow eyebrow--center">Why we built it this way</span>
+      <h2 class="t-h2">Four features, four design principles</h2>
+      <p class="t-lede u-center">
+        Not testimonials — we're a hackathon project, not a company with pilot
+        classrooms yet. Here's the reasoning behind each feature instead.
+      </p>
+    </header>
+
+    <div class="voices">
+      {% for v in testimonials %}
+        <figure class="card card--lift voice" data-accent="{{ v.accent }}" data-reveal data-bloom tabindex="0">
+          <span class="card__bloom" aria-hidden="true"></span>
+          <span class="card__edge" aria-hidden="true"></span>
+
+          <blockquote class="voice__quote">
+            <svg class="voice__mark" aria-hidden="true"><use href="#i-quote"></use></svg>
+            {{ v.quote }}
+          </blockquote>
+
+          <figcaption class="voice__who">
+            <span class="avatar" aria-hidden="true">{{ v.initials }}</span>
+            <span class="stack">
+              <span class="voice__name">{{ v.name }}</span>
+              <span class="voice__role">{{ v.role }}</span>
+            </span>
+          </figcaption>
+        </figure>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>

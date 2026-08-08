@@ -1,0 +1,119 @@
+{% comment %}
+  Capabilities bento grid.
+
+  Four cards on a 4-column grid: two `wide` (2x1) and two `tall` (2x2). Each
+  carries a live micro-demo rather than a static screenshot — a refusing tutor
+  chat, an evidence graph, a belief meter, a cluster chart — because the claim
+  of each card is more convincing when it is running.
+{% endcomment %}
+<section class="section" id="capabilities">
+  <div class="shell shell--wide">
+
+    <header class="section__head section__head--center" data-reveal>
+      <span class="eyebrow eyebrow--center">Four systems, one database</span>
+      <h2 class="t-h2">Everything a gradebook cannot do</h2>
+      <p class="t-lede u-center">
+        Two of these face students, two face teachers. All four read the same
+        course database, which is the only reason any of them work.
+      </p>
+    </header>
+
+    <div class="bento">
+      {% for cap in capabilities %}
+        <article class="card card--lift bento__cell"
+                 data-size="{{ cap.size }}"
+                 data-accent="{{ cap.accent }}"
+                 data-reveal
+                 data-bloom
+                 tabindex="0">
+          <span class="card__bloom" aria-hidden="true"></span>
+          <span class="card__edge" aria-hidden="true"></span>
+
+          <div class="row row--between">
+            <span class="bento__index">{{ cap.index }}</span>
+            <span class="badge badge--accent">{{ cap.audience }}</span>
+          </div>
+
+          <div class="bento__head">
+            <span class="icon-tile" aria-hidden="true">
+              <svg>
+                <use href="#{{ cap.icon }}"></use>
+              </svg>
+            </span>
+            <h3 class="bento__title">{{ cap.title }}</h3>
+          </div>
+
+          <p class="bento__blurb">{{ cap.blurb }}</p>
+
+          {% comment %} --- per-card live demo --- {% endcomment %}
+
+          {% if cap.id == 'tutor' %}
+            <div class="minichat" data-minichat>
+              {% for turn in tutor_exchange %}
+                <div class="minichat__row" data-role="{{ turn.role }}">
+                  <span class="minichat__bubble">{{ turn.text }}</span>
+                </div>
+              {% endfor %}
+              <p class="minichat__foot">
+                <span class="thinking" aria-hidden="true"><i></i><i></i><i></i></span>
+                answered in seconds, grounded in the course
+              </p>
+            </div>
+          {% endif %}
+
+          {% if cap.id == 'marksheet' %}
+            <div class="belief">
+              <p class="belief__quote">“Strong performance in Science, but a clear gap in Mathematics.”</p>
+              <span class="belief__row">
+                <span>Overall average</span>
+                <span data-belief-label>72%</span>
+              </span>
+              <span class="meter meter--tall" role="img" aria-label="Marksheet average score">
+                <span class="meter__fill" style="--meter-value: 72"></span>
+              </span>
+              <p class="t-micro">Written separately for the student and the teacher.</p>
+            </div>
+          {% endif %}
+
+          {% if cap.id == 'lessons' %}
+            <div class="clusters">
+              <div class="cluster">
+                <span class="cluster__row">
+                  <span>🎬 Video embeds</span>
+                  <span class="cluster__count">auto-detected</span>
+                </span>
+                <span class="meter"><span class="meter__fill" style="--meter-value: 100"></span></span>
+              </div>
+              <div class="cluster">
+                <span class="cluster__row">
+                  <span>📝 Written notes</span>
+                  <span class="cluster__count">inline</span>
+                </span>
+                <span class="meter"><span class="meter__fill" style="--meter-value: 100"></span></span>
+              </div>
+              <div class="cluster">
+                <span class="cluster__row">
+                  <span>📎 Files &amp; 🔗 links</span>
+                  <span class="cluster__count">downloadable</span>
+                </span>
+                <span class="meter"><span class="meter__fill" style="--meter-value: 100"></span></span>
+              </div>
+            </div>
+          {% endif %}
+
+          <ul class="bento__bullets">
+            {% for b in cap.bullets %}
+              <li>{{ b }}</li>
+            {% endfor %}
+          </ul>
+
+          <div class="bento__metric">
+            <span class="bento__metric-val">{{ cap.metric.value }}</span>
+            <span class="bento__metric-label">{{ cap.metric.label }}</span>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>

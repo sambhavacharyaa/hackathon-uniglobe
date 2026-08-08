@@ -1,0 +1,481 @@
+/* ==========================================================================
+   SKILL UP — DESIGN TOKENS
+   --------------------------------------------------------------------------
+   The single source of truth for colour, type, space, radius, elevation,
+   motion and z-index. Nothing in index.css or animations.css may invent a
+   literal value that belongs in here.
+
+   Style DNA (blended, in order of weight):
+     · AI-Native UI        — minimal chrome, single accent, streaming surfaces
+     · Dark Mode (OLED)    — near-black canvas, luminous accents
+     · Gradient Mesh       — aurora field behind everything, 18–24s drift
+     · Bento Grids         — modular cards, 20–28px radii, varied spans
+     · Kinetic Typography  — oversized display type, split-line reveals
+     · Interactive Cursor  — custom pointer, magnetic targets
+
+   Palette provenance (ui-ux-pro-max/data/colors.csv):
+     row 19 AI/Chatbot Platform      #7C3AED primary, #06B6D4 CTA
+     row 45 Online Course/E-learning #0D9488 progress, #F97316 achievement
+     row 10 Educational App          #4F46E5 indigo
+   Type provenance (typography.csv row 3 "Tech Startup" + row 9 mono):
+     Space Grotesk / DM Sans / JetBrains Mono
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. RAW RAMPS
+   Unthemed values. Never referenced directly by components — themed aliases
+   in section 2 point at these so light mode can repoint them wholesale.
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* Violet — primary brand ramp */
+  --violet-50: #f3f0ff;
+  --violet-100: #e6e0ff;
+  --violet-200: #cfc4ff;
+  --violet-300: #b3a1ff;
+  --violet-400: #957dff;
+  --violet-500: #7c6bff;
+  --violet-600: #6647f0;
+  --violet-700: #5433cc;
+  --violet-800: #422a9e;
+  --violet-900: #2f1f6e;
+  --violet-950: #1b1240;
+
+  /* Cyan — analysis / data ramp */
+  --cyan-50: #ecfeff;
+  --cyan-100: #cffafe;
+  --cyan-200: #a5f3fc;
+  --cyan-300: #67e8f9;
+  --cyan-400: #22d3ee;
+  --cyan-500: #06b6d4;
+  --cyan-600: #0891b2;
+  --cyan-700: #0e7490;
+  --cyan-800: #155e75;
+  --cyan-900: #164e63;
+
+  /* Amber — attention / CTA ramp */
+  --amber-50: #fff8ed;
+  --amber-100: #ffeed4;
+  --amber-200: #ffd9a8;
+  --amber-300: #ffbe71;
+  --amber-400: #ff9838;
+  --amber-500: #ff7a2f;
+  --amber-600: #ed5c11;
+  --amber-700: #c44310;
+  --amber-800: #9c3615;
+  --amber-900: #7e2f14;
+
+  /* Emerald — success / progress ramp */
+  --emerald-50: #ecfdf5;
+  --emerald-100: #d1fae5;
+  --emerald-200: #a7f3d0;
+  --emerald-300: #6ee7b7;
+  --emerald-400: #34d399;
+  --emerald-500: #10b981;
+  --emerald-600: #059669;
+  --emerald-700: #047857;
+  --emerald-800: #065f46;
+  --emerald-900: #064e3b;
+
+  /* Rose — error ramp */
+  --rose-300: #fda4af;
+  --rose-400: #fb7185;
+  --rose-500: #f43f5e;
+  --rose-600: #e11d48;
+
+  /* Slate — neutral ramp, cooled slightly toward violet */
+  --slate-0: #ffffff;
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #7d8ba3;
+  --slate-600: #556180;
+  --slate-700: #3a4462;
+  --slate-800: #232c47;
+  --slate-850: #181f36;
+  --slate-900: #101728;
+  --slate-925: #0a0f1d;
+  --slate-950: #060913;
+  --slate-1000: #03050c;
+}
+
+/* --------------------------------------------------------------------------
+   2. THEMED ALIASES — DARK (default)
+   -------------------------------------------------------------------------- */
+
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Surfaces, from furthest back to closest to the reader */
+  --bg-void: #03050c;
+  --bg: #060913;
+  --bg-raised: #0a0f1d;
+  --surface: rgba(19, 25, 45, 0.66);
+  --surface-solid: #101728;
+  --surface-strong: rgba(28, 36, 62, 0.82);
+  --surface-hover: rgba(34, 43, 74, 0.86);
+  --surface-sunken: rgba(3, 5, 12, 0.55);
+
+  /* Ink */
+  --text: #f2f5fb;
+  --text-strong: #ffffff;
+  --text-muted: #a3aec5;
+  --text-dim: #78849e;
+  --text-faint: #4e5975;
+  --text-inverse: #060913;
+
+  /* Lines */
+  --line: rgba(148, 163, 184, 0.14);
+  --line-soft: rgba(148, 163, 184, 0.08);
+  --line-strong: rgba(148, 163, 184, 0.26);
+  --line-accent: rgba(124, 107, 255, 0.42);
+
+  /* Brand roles */
+  --brand: var(--violet-500);
+  --brand-soft: var(--violet-400);
+  --brand-deep: var(--violet-700);
+  --brand-ink: #ffffff;
+  --brand-wash: rgba(124, 107, 255, 0.14);
+  --brand-wash-strong: rgba(124, 107, 255, 0.26);
+
+  --accent-cyan: var(--cyan-400);
+  --accent-cyan-wash: rgba(34, 211, 238, 0.13);
+  --accent-amber: var(--amber-500);
+  --accent-amber-wash: rgba(255, 122, 47, 0.14);
+  --accent-emerald: var(--emerald-400);
+  --accent-emerald-wash: rgba(52, 211, 153, 0.13);
+  --accent-rose: var(--rose-400);
+  --accent-rose-wash: rgba(251, 113, 133, 0.13);
+  --accent-slate: var(--slate-400);
+  --accent-slate-wash: rgba(148, 163, 184, 0.12);
+
+  /* Semantic */
+  --ok: var(--emerald-400);
+  --warn: var(--amber-400);
+  --bad: var(--rose-400);
+
+  /* Glass */
+  --glass-bg: rgba(16, 23, 40, 0.58);
+  /* Panels using this sit over the animated aurora and, in the hero, over a
+     WebGL canvas. 0.84 let enough light through to wash out the mono text
+     inside the HUD, so it is deliberately close to opaque; the backdrop blur
+     still reads as glass. */
+  --glass-bg-strong: rgba(13, 19, 35, 0.93);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-border-lit: rgba(255, 255, 255, 0.18);
+  --glass-blur: 22px;
+  --glass-blur-heavy: 40px;
+
+  /* Aurora field */
+  --aurora-1: rgba(124, 107, 255, 0.42);
+  --aurora-2: rgba(34, 211, 238, 0.28);
+  --aurora-3: rgba(255, 122, 47, 0.2);
+  --aurora-4: rgba(52, 211, 153, 0.18);
+  --aurora-opacity: 1;
+  --grain-opacity: 0.035;
+  --grid-opacity: 0.5;
+
+  /* Shadows — dark UIs need glow more than drop shadow */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.42);
+  --shadow-md: 0 12px 30px -12px rgba(0, 0, 0, 0.75);
+  --shadow-lg: 0 28px 64px -24px rgba(0, 0, 0, 0.82);
+  --shadow-xl: 0 48px 110px -40px rgba(0, 0, 0, 0.9);
+  --glow-brand: 0 0 0 1px rgba(124, 107, 255, 0.28), 0 18px 60px -18px rgba(124, 107, 255, 0.6);
+  --glow-cyan: 0 0 0 1px rgba(34, 211, 238, 0.26), 0 18px 60px -18px rgba(34, 211, 238, 0.48);
+  --glow-amber: 0 0 0 1px rgba(255, 122, 47, 0.26), 0 18px 60px -18px rgba(255, 122, 47, 0.48);
+  --glow-emerald: 0 0 0 1px rgba(52, 211, 153, 0.26), 0 18px 60px -18px rgba(52, 211, 153, 0.44);
+
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--violet-400);
+  --scrim: rgba(3, 5, 12, 0.78);
+  --code-bg: rgba(3, 5, 12, 0.62);
+}
+
+/* --------------------------------------------------------------------------
+   3. THEMED ALIASES — LIGHT
+   Contrast checked against the ui-ux-pro-max light-mode rules: body text at
+   slate-900, muted text no lighter than slate-600, glass at >=80% opacity,
+   borders visible rather than white/10.
+   -------------------------------------------------------------------------- */
+
+[data-theme='light'] {
+  color-scheme: light;
+
+  --bg-void: #eef1f8;
+  --bg: #f7f8fc;
+  --bg-raised: #ffffff;
+  --surface: rgba(255, 255, 255, 0.88);
+  --surface-solid: #ffffff;
+  --surface-strong: rgba(255, 255, 255, 0.96);
+  --surface-hover: #ffffff;
+  --surface-sunken: rgba(15, 23, 42, 0.04);
+
+  --text: #10172a;
+  --text-strong: #05070f;
+  --text-muted: #4a5570;
+  --text-dim: #5c6784;
+  --text-faint: #8390a8;
+  --text-inverse: #ffffff;
+
+  --line: rgba(15, 23, 42, 0.12);
+  --line-soft: rgba(15, 23, 42, 0.07);
+  --line-strong: rgba(15, 23, 42, 0.2);
+  --line-accent: rgba(84, 51, 204, 0.34);
+
+  --brand: var(--violet-700);
+  --brand-soft: var(--violet-600);
+  --brand-deep: var(--violet-800);
+  --brand-ink: #ffffff;
+  --brand-wash: rgba(84, 51, 204, 0.09);
+  --brand-wash-strong: rgba(84, 51, 204, 0.16);
+
+  --accent-cyan: var(--cyan-700);
+  --accent-cyan-wash: rgba(14, 116, 144, 0.1);
+  --accent-amber: var(--amber-700);
+  --accent-amber-wash: rgba(196, 67, 16, 0.1);
+  --accent-emerald: var(--emerald-700);
+  --accent-emerald-wash: rgba(4, 120, 87, 0.1);
+  --accent-rose: var(--rose-600);
+  --accent-rose-wash: rgba(225, 29, 72, 0.1);
+  --accent-slate: var(--slate-600);
+  --accent-slate-wash: rgba(85, 97, 128, 0.1);
+
+  --ok: var(--emerald-700);
+  --warn: var(--amber-700);
+  --bad: var(--rose-600);
+
+  --glass-bg: rgba(255, 255, 255, 0.86);
+  --glass-bg-strong: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(15, 23, 42, 0.1);
+  --glass-border-lit: rgba(15, 23, 42, 0.18);
+
+  --aurora-1: rgba(124, 107, 255, 0.3);
+  --aurora-2: rgba(6, 182, 212, 0.22);
+  --aurora-3: rgba(255, 122, 47, 0.16);
+  --aurora-4: rgba(16, 185, 129, 0.14);
+  --aurora-opacity: 0.72;
+  --grain-opacity: 0.02;
+  --grid-opacity: 0.34;
+
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.07);
+  --shadow-md: 0 14px 32px -14px rgba(15, 23, 42, 0.18);
+  --shadow-lg: 0 30px 64px -26px rgba(15, 23, 42, 0.24);
+  --shadow-xl: 0 48px 110px -44px rgba(15, 23, 42, 0.28);
+  --glow-brand: 0 0 0 1px rgba(84, 51, 204, 0.22), 0 18px 46px -20px rgba(84, 51, 204, 0.36);
+  --glow-cyan: 0 0 0 1px rgba(14, 116, 144, 0.2), 0 18px 46px -20px rgba(14, 116, 144, 0.3);
+  --glow-amber: 0 0 0 1px rgba(196, 67, 16, 0.2), 0 18px 46px -20px rgba(196, 67, 16, 0.3);
+  --glow-emerald: 0 0 0 1px rgba(4, 120, 87, 0.2), 0 18px 46px -20px rgba(4, 120, 87, 0.28);
+
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--violet-600);
+  --scrim: rgba(15, 23, 42, 0.42);
+  --code-bg: rgba(15, 23, 42, 0.05);
+}
+
+/* --------------------------------------------------------------------------
+   4. TYPOGRAPHY
+   -------------------------------------------------------------------------- */
+
+:root {
+  --font-display: 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-body: 'DM Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', 'Consolas', ui-monospace, monospace;
+
+  /* Fluid scale. clamp() min is the 375px value, max the 1440px value. */
+  --fs-2xs: clamp(0.66rem, 0.63rem + 0.14vw, 0.72rem);
+  --fs-xs: clamp(0.75rem, 0.72rem + 0.15vw, 0.82rem);
+  --fs-sm: clamp(0.86rem, 0.83rem + 0.16vw, 0.94rem);
+  --fs-base: clamp(1rem, 0.96rem + 0.2vw, 1.08rem);
+  --fs-md: clamp(1.08rem, 1.02rem + 0.3vw, 1.22rem);
+  --fs-lg: clamp(1.22rem, 1.12rem + 0.5vw, 1.45rem);
+  --fs-xl: clamp(1.44rem, 1.26rem + 0.9vw, 1.9rem);
+  --fs-2xl: clamp(1.75rem, 1.44rem + 1.55vw, 2.6rem);
+  --fs-3xl: clamp(2.1rem, 1.6rem + 2.5vw, 3.5rem);
+  --fs-4xl: clamp(2.5rem, 1.7rem + 4vw, 4.6rem);
+  --fs-5xl: clamp(2.6rem, 1.5rem + 5.2vw, 5.4rem);
+  /* --fs-6xl is the hero headline and is sized from a measurement, not taste.
+     The longest line ("Every wrong answer") occupies 9.69x the font size in
+     Space Grotesk Bold, and the hero copy column is ~59% of the shell. The
+     4rem cap keeps that line on one row down to roughly 1300px, below which
+     a media query in sections.css takes over. */
+  --fs-6xl: clamp(2.55rem, 1.1rem + 4vw, 4.7rem);
+
+  --lh-tight: 1.02;
+  --lh-snug: 1.16;
+  --lh-normal: 1.5;
+  --lh-relaxed: 1.68;
+  --lh-loose: 1.8;
+
+  --tracking-tighter: -0.045em;
+  /* Figures get their own, gentler tracking. Space Grotesk's "1" carries a
+     flag that overhangs its left sidebearing, so display tracking makes
+     consecutive digits ("11", "15") visibly collide even though the advance
+     widths are correct. Anything showing a number uses this instead. */
+  --tracking-num: -0.005em;
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.12em;
+  --tracking-widest: 0.2em;
+
+  --fw-light: 300;
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* Reading measure — the ui-ux rule is 65–75 characters */
+  --measure: 68ch;
+  --measure-tight: 54ch;
+  --measure-wide: 80ch;
+}
+
+/* --------------------------------------------------------------------------
+   5. SPACE, RADIUS, LAYOUT
+   -------------------------------------------------------------------------- */
+
+:root {
+  --sp-3xs: 0.25rem;
+  --sp-2xs: 0.375rem;
+  --sp-xs: 0.5rem;
+  --sp-sm: 0.75rem;
+  --sp-md: 1rem;
+  --sp-lg: 1.5rem;
+  --sp-xl: 2rem;
+  --sp-2xl: 3rem;
+  --sp-3xl: 4rem;
+  --sp-4xl: 6rem;
+  --sp-5xl: 8rem;
+  --sp-6xl: 11rem;
+
+  --section-y: clamp(4.5rem, 3rem + 7vw, 9.5rem);
+  --section-y-tight: clamp(3rem, 2rem + 4vw, 6rem);
+
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 26px;
+  --r-2xl: 34px;
+  --r-3xl: 44px;
+  --r-pill: 999px;
+  --r-circle: 50%;
+
+  --container: 1240px;
+  --container-wide: 1440px;
+  --container-narrow: 880px;
+  --gutter: clamp(1.15rem, 0.6rem + 2.6vw, 2.75rem);
+
+  --nav-h: 68px;
+  --nav-inset: 14px;
+
+  --bento-gap: clamp(0.85rem, 0.5rem + 1.1vw, 1.35rem);
+  --border-w: 1px;
+}
+
+/* --------------------------------------------------------------------------
+   6. MOTION
+   Durations follow the ui-ux-pro-max guidance: 150–300ms for
+   micro-interactions, longer only for ambient / scroll-linked work.
+   -------------------------------------------------------------------------- */
+
+:root {
+  --d-instant: 90ms;
+  --d-fast: 160ms;
+  --d-base: 240ms;
+  --d-slow: 380ms;
+  --d-slower: 620ms;
+  --d-cinematic: 1100ms;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-swift: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-lazy: cubic-bezier(0.6, 0.04, 0.28, 0.97);
+
+  --t-color: color var(--d-base) var(--ease-out),
+             background-color var(--d-base) var(--ease-out),
+             border-color var(--d-base) var(--ease-out);
+  --t-transform: transform var(--d-base) var(--ease-out);
+  --t-all: transform var(--d-base) var(--ease-out),
+           opacity var(--d-base) var(--ease-out),
+           box-shadow var(--d-base) var(--ease-out),
+           background-color var(--d-base) var(--ease-out),
+           border-color var(--d-base) var(--ease-out),
+           color var(--d-base) var(--ease-out);
+
+  --aurora-drift: 22s;
+  --marquee-speed: 44s;
+}
+
+/* --------------------------------------------------------------------------
+   7. Z-INDEX SCALE
+   A published scale so nothing invents a 9999 later.
+   -------------------------------------------------------------------------- */
+
+:root {
+  --z-under: -1;
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 20;
+  --z-nav: 30;
+  --z-drawer: 40;
+  --z-overlay: 50;
+  --z-modal: 60;
+  --z-toast: 70;
+  --z-cursor: 90;
+  --z-preloader: 100;
+}
+
+/* --------------------------------------------------------------------------
+   8. ACCENT CONTEXTS
+   Any block can set data-accent="cyan|amber|emerald|slate" and every
+   descendant picks up a matched --a-* trio. This is how the bento cards,
+   pipeline steps and student chips stay colour-coordinated without a
+   combinatorial explosion of classes.
+   -------------------------------------------------------------------------- */
+
+[data-accent] {
+  --a: var(--brand);
+  --a-wash: var(--brand-wash);
+  --a-glow: var(--glow-brand);
+}
+
+[data-accent='violet'] {
+  --a: var(--brand);
+  --a-wash: var(--brand-wash);
+  --a-glow: var(--glow-brand);
+}
+
+[data-accent='cyan'] {
+  --a: var(--accent-cyan);
+  --a-wash: var(--accent-cyan-wash);
+  --a-glow: var(--glow-cyan);
+}
+
+[data-accent='amber'] {
+  --a: var(--accent-amber);
+  --a-wash: var(--accent-amber-wash);
+  --a-glow: var(--glow-amber);
+}
+
+[data-accent='emerald'] {
+  --a: var(--accent-emerald);
+  --a-wash: var(--accent-emerald-wash);
+  --a-glow: var(--glow-emerald);
+}
+
+[data-accent='rose'] {
+  --a: var(--accent-rose);
+  --a-wash: var(--accent-rose-wash);
+  --a-glow: var(--glow-brand);
+}
+
+[data-accent='slate'] {
+  --a: var(--accent-slate);
+  --a-wash: var(--accent-slate-wash);
+  --a-glow: var(--shadow-lg);
+}

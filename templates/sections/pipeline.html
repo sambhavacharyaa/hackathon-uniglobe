@@ -1,0 +1,49 @@
+{% comment %}
+  How it works — four steps.
+
+  With GSAP loaded, motion.js pins this section and drives the track sideways
+  as the page scrolls (the containerAnimation pattern, ease "none" so scroll
+  and horizontal position stay 1:1). Without GSAP the viewport simply becomes
+  a normal horizontal scroller with snap points, which is a perfectly good
+  interaction in its own right.
+{% endcomment %}
+<section class="section pipeline" id="pipeline" data-pipeline>
+  <div class="shell shell--wide">
+
+    <header class="section__head section__head--split" data-reveal>
+      <div class="stack stack-md">
+        <span class="eyebrow">From sign-up to insight</span>
+        <h2 class="t-h2">Four steps, no magic in any of them</h2>
+      </div>
+      <p class="t-lede">
+        The interesting engineering is not the model call. It is keeping enough of
+        the right data that the model call has something to reason about.
+      </p>
+    </header>
+
+    <div class="pipeline__viewport" data-pipeline-viewport>
+      <div class="pipeline__track" data-pipeline-track>
+        {% for step in pipeline %}
+          <article class="pipeline__panel" data-accent="{{ step.accent }}" data-pipeline-panel>
+            <span class="pipeline__step-num" aria-hidden="true">{{ step.step }}</span>
+            <div class="stack stack-sm">
+              <h3 class="pipeline__step-title">{{ step.title }}</h3>
+              <p class="pipeline__step-body">{{ step.body }}</p>
+            </div>
+            <code class="code">{{ step.code }}</code>
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="pipeline__rail" aria-hidden="true">
+      <span class="pipeline__rail-fill" data-pipeline-fill></span>
+    </div>
+    <div class="pipeline__dots" aria-hidden="true" data-pipeline-dots>
+      {% for step in pipeline %}
+        <span{% if forloop.first %} class="is-on"{% endif %}>{{ step.step }} · {{ step.title }}</span>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,231 @@
+{% comment %}
+  SVG sprite.
+
+  Every icon in the project is defined once here and referenced with
+  <svg class="..."><use href="#i-name"></use></svg>. One 24x24 viewBox for
+  all of them, so sizing is consistent wherever they land, and no emoji is
+  ever used as an interface icon.
+
+  Strokes inherit currentColor; the wrapper element controls colour and size.
+{% endcomment %}
+<svg class="u-sr" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <g id="i-base" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"></g>
+  </defs>
+
+  {# --- brand ------------------------------------------------------------ #}
+  <symbol id="i-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 17.5 9.2 12l3.1 3.3L20 6.5"/>
+    <path d="M4 20.5h16"/>
+    <circle cx="9.2" cy="12" r="1.4"/>
+    <circle cx="12.3" cy="15.3" r="1.4"/>
+  </symbol>
+
+  <symbol id="i-glyph" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 46 24 30l9 9L54 16"/>
+    <circle cx="24" cy="30" r="4"/>
+  </symbol>
+
+  {# --- navigation & chrome ---------------------------------------------- #}
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <path d="M4 7h16M4 12h16M4 17h10"/>
+  </symbol>
+
+  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <path d="M6 6l12 12M18 6L6 18"/>
+  </symbol>
+
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="11" cy="11" r="7"/>
+    <path d="m20 20-3.6-3.6"/>
+  </symbol>
+
+  <symbol id="i-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 19V5M6 11l6-6 6 6"/>
+  </symbol>
+
+  <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 12h14M13 6l6 6-6 6"/>
+  </symbol>
+
+  <symbol id="i-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 5v14M6 13l6 6 6-6"/>
+  </symbol>
+
+  <symbol id="i-corner-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 5v6a3 3 0 0 0 3 3h12"/>
+    <path d="m15 10 5 4-5 4"/>
+  </symbol>
+
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 14.5A8.2 8.2 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/>
+  </symbol>
+
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4"/>
+    <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+  </symbol>
+
+  {# --- state ------------------------------------------------------------ #}
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m5 12.5 4.5 4.5L19 7"/>
+  </symbol>
+
+  <symbol id="i-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/>
+    <path d="m8 12.2 2.7 2.7L16 9.6"/>
+  </symbol>
+
+  <symbol id="i-x-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/>
+    <path d="M9.2 9.2l5.6 5.6M14.8 9.2l-5.6 5.6"/>
+  </symbol>
+
+  <symbol id="i-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <path d="M6 12h12"/>
+  </symbol>
+
+  <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 4.5 21 19H3l9-14.5Z"/>
+    <path d="M12 10v4M12 16.6v.1"/>
+  </symbol>
+
+  <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/>
+    <path d="M12 11v5M12 7.8v.1"/>
+  </symbol>
+
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3 20 6v6c0 4.6-3.2 7.9-8 9-4.8-1.1-8-4.4-8-9V6l8-3Z"/>
+    <path d="m9 12 2.2 2.2L15.4 10"/>
+  </symbol>
+
+  <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/>
+    <path d="M8.2 10.5V7.8a3.8 3.8 0 0 1 7.6 0v2.7"/>
+  </symbol>
+
+  {# --- domain ------------------------------------------------------------ #}
+  <symbol id="i-brain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 5.2a2.7 2.7 0 0 0-5.1-1.1A2.9 2.9 0 0 0 4 8.4a3 3 0 0 0-.4 4.6A3 3 0 0 0 5 18a2.8 2.8 0 0 0 4.4 2.2A2.6 2.6 0 0 0 12 18.6Z"/>
+    <path d="M12 5.2a2.7 2.7 0 0 1 5.1-1.1A2.9 2.9 0 0 1 20 8.4a3 3 0 0 1 .4 4.6A3 3 0 0 1 19 18a2.8 2.8 0 0 1-4.4 2.2A2.6 2.6 0 0 1 12 18.6Z"/>
+    <path d="M12 5.2v13.4"/>
+  </symbol>
+
+  <symbol id="i-search-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13.5 3H6.8A1.8 1.8 0 0 0 5 4.8v14.4A1.8 1.8 0 0 0 6.8 21h10.4a1.8 1.8 0 0 0 1.8-1.8V8.2Z"/>
+    <path d="M13.5 3v5.2h5.5"/>
+    <circle cx="11.4" cy="14" r="2.6"/>
+    <path d="m13.6 16.2 1.9 1.9"/>
+  </symbol>
+
+  <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.5 12a7.6 7.6 0 0 1-8.2 7.6L7 21l1.2-3.4A7.6 7.6 0 1 1 20.5 12Z"/>
+    <path d="M9 11h6M9 14.2h3.5"/>
+  </symbol>
+
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="9.5" cy="8.5" r="3.3"/>
+    <path d="M3.5 20a6 6 0 0 1 12 0"/>
+    <path d="M16.4 5.6a3.3 3.3 0 0 1 0 6.3"/>
+    <path d="M18 14.6a6 6 0 0 1 2.5 4.9"/>
+  </symbol>
+
+  <symbol id="i-graduation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m2.8 9 9.2-4.4L21.2 9 12 13.4Z"/>
+    <path d="M6.6 11v4.6c0 1.6 2.4 2.9 5.4 2.9s5.4-1.3 5.4-2.9V11"/>
+    <path d="M21.2 9v5"/>
+  </symbol>
+
+  <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="8.5"/>
+    <circle cx="12" cy="12" r="4.6"/>
+    <circle cx="12" cy="12" r="1"/>
+  </symbol>
+
+  <symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13.2 2.5 4.8 13.4h6L10 21.5l8.6-11h-6.1Z"/>
+  </symbol>
+
+  <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m12 3 8.6 4.5L12 12 3.4 7.5Z"/>
+    <path d="m3.4 12.4 8.6 4.5 8.6-4.5"/>
+    <path d="m3.4 16.9 8.6 4.5 8.6-4.5"/>
+  </symbol>
+
+  <symbol id="i-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="6.5" y="6.5" width="11" height="11" rx="2.2"/>
+    <rect x="9.8" y="9.8" width="4.4" height="4.4" rx="1"/>
+    <path d="M10 3v3.5M14 3v3.5M10 17.5V21M14 17.5V21M3 10h3.5M3 14h3.5M17.5 10H21M17.5 14H21"/>
+  </symbol>
+
+  <symbol id="i-database" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="12" cy="6" rx="7.5" ry="3"/>
+    <path d="M4.5 6v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3V6"/>
+    <path d="M4.5 12v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-6"/>
+  </symbol>
+
+  <symbol id="i-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 12h3.6l2.6-7 4.2 14 2.6-7H21"/>
+  </symbol>
+
+  <symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m9 3.5 1.5 4L14.5 9l-4 1.5L9 14.5 7.5 10.5 3.5 9l4-1.5Z"/>
+    <path d="m17.5 13.5.9 2.4 2.4.9-2.4.9-.9 2.4-.9-2.4-2.4-.9 2.4-.9Z"/>
+  </symbol>
+
+  <symbol id="i-compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/>
+    <path d="m15.4 8.6-1.9 5-5 1.9 1.9-5Z"/>
+  </symbol>
+
+  <symbol id="i-quote" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+    <path d="M9.6 5.4c-3.3 1.5-5.4 4.4-5.4 8v5.2h6.6V12H7.4c0-2.1 1.1-3.6 3.1-4.6ZM20.4 5.4C17.1 6.9 15 9.8 15 13.4v5.2h6.6V12h-3.4c0-2.1 1.1-3.6 3.1-4.6Z"/>
+  </symbol>
+
+  <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/>
+    <path d="m10 8.6 6 3.4-6 3.4Z"/>
+  </symbol>
+
+  <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 11.5A8 8 0 0 0 6.3 6.3L4 8.5"/>
+    <path d="M4 4.5v4h4"/>
+    <path d="M4 12.5a8 8 0 0 0 13.7 5.2L20 15.5"/>
+    <path d="M20 19.5v-4h-4"/>
+  </symbol>
+
+  <symbol id="i-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="4.5" width="18" height="15" rx="2.4"/>
+    <path d="m7.5 10 2.6 2.4-2.6 2.4M13 15h3.6"/>
+  </symbol>
+
+  <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/>
+    <path d="M3 12h18"/>
+    <path d="M12 3c2.4 2.6 3.7 5.7 3.7 9S14.4 18.4 12 21c-2.4-2.6-3.7-5.7-3.7-9S9.6 5.6 12 3Z"/>
+  </symbol>
+
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/>
+    <path d="M12 7v5.3l3.4 2"/>
+  </symbol>
+
+  <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 5.2A2.2 2.2 0 0 1 6.2 3H20v15H6.2A2.2 2.2 0 0 0 4 20.2Z"/>
+    <path d="M4 20.2A2.2 2.2 0 0 1 6.2 18H20v3H6.2A2.2 2.2 0 0 1 4 18.8Z"/>
+  </symbol>
+
+  {# --- social ------------------------------------------------------------ #}
+  <symbol id="i-github" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+    <path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48l-.01-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5.01 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85l-.01 2.75c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/>
+  </symbol>
+
+  <symbol id="i-x" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+    <path d="M17.53 3h3.02l-6.6 7.54L21.7 21h-6.06l-4.75-6.2L5.46 21H2.44l7.05-8.06L2.3 3h6.22l4.29 5.67L17.53 3Zm-1.06 16.2h1.67L7.6 4.71H5.81L16.47 19.2Z"/>
+  </symbol>
+
+  <symbol id="i-linkedin" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+    <path d="M6.94 5.5a1.94 1.94 0 1 1-3.88 0 1.94 1.94 0 0 1 3.88 0ZM3.2 8.98h3.5V21H3.2V8.98Zm5.72 0h3.35v1.64h.05c.47-.85 1.6-1.75 3.3-1.75 3.53 0 4.18 2.24 4.18 5.15V21h-3.5v-5.31c0-1.27-.02-2.9-1.8-2.9-1.8 0-2.08 1.38-2.08 2.81V21h-3.5V8.98Z"/>
+  </symbol>
+</svg>

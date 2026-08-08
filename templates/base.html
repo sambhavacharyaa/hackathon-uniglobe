@@ -1,15 +1,42 @@
-{% load static %}<!DOCTYPE html>
-<html lang="en">
+{% load static %}<!doctype html>
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}LMS{% endblock %}</title>
+    <meta name="color-scheme" content="dark light">
+    <title>{% block title %}Skill Up{% endblock %}</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237c6bff'/%3E%3Cpath d='M7 22l6-7 4 4 8-9' stroke='white' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+
     <link rel="stylesheet" href="{% static 'css/theme.css' %}">
     <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    {% block extra_css %}{% endblock %}
+
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('skillup-theme');
+                if (stored === 'light' || stored === 'dark') {
+                    document.documentElement.setAttribute('data-theme', stored);
+                }
+            } catch (e) { /* localStorage unavailable — dark default stands */ }
+        })();
+    </script>
 </head>
 <body>
+    <div class="bg-stack" aria-hidden="true">
+        <div class="bg-grid"></div>
+        <div class="bg-aurora"><span></span><span></span><span></span></div>
+        <div class="bg-vignette"></div>
+    </div>
+
     <nav class="navbar">
-        <a class="brand" href="{% url 'dashboard' %}"><span>L</span>MS</a>
+        <a class="brand" href="{% url 'dashboard' %}"><span>Skill</span>Up</a>
         <div class="nav-links">
             {% if user.is_authenticated %}
                 {% if user.is_student %}
@@ -17,13 +44,19 @@
                 {% endif %}
                 <span class="role-pill {% if user.is_instructor %}role-pill-instructor{% else %}role-pill-student{% endif %}">{{ user.get_role_display }}</span>
                 <span class="nav-user">{{ user.email }}</span>
+                <button type="button" class="btn-icon" data-theme-toggle aria-label="Switch theme" title="Switch theme">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+                </button>
                 <form action="{% url 'logout' %}" method="post" class="inline-form">
                     {% csrf_token %}
                     <button type="submit" class="link-button">Log out</button>
                 </form>
             {% else %}
+                <button type="button" class="btn-icon" data-theme-toggle aria-label="Switch theme" title="Switch theme">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+                </button>
                 <a href="{% url 'login' %}">Log in</a>
-                <a href="{% url 'register' %}">Sign up</a>
+                <a href="{% url 'register' %}" class="btn btn-primary btn-sm">Sign up</a>
             {% endif %}
         </div>
     </nav>
@@ -39,5 +72,19 @@
 
         {% block content %}{% endblock %}
     </main>
+
+    <script>
+        (function () {
+            var btn = document.querySelector('[data-theme-toggle]');
+            if (!btn) return;
+            btn.addEventListener('click', function () {
+                var root = document.documentElement;
+                var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                root.setAttribute('data-theme', next);
+                try { localStorage.setItem('skillup-theme', next); } catch (e) { /* ignore */ }
+            });
+        })();
+    </script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,130 @@
+{% comment %}
+  Hero.
+
+  Left column: kinetic headline. Each line sits inside an overflow-hidden
+  window so the inner span can be driven up from below — GSAP animates it when
+  present, and a CSS keyframe covers the case where it is not. motion.js
+  further splits the accent line into per-character spans.
+
+  Right column: a HUD that replays a real attempt stream and resolves into a
+  diagnosis. It is rendered fully in HTML first; the script only reveals lines
+  in sequence, so with JS off the whole transcript is simply readable.
+{% endcomment %}
+<section class="hero" id="top">
+
+  {% comment %}
+    WebGL background. scene.js paints here; both the canvas and the CSS
+    fallback behind it are decorative, hence aria-hidden.
+  {% endcomment %}
+  <canvas class="hero__canvas" data-scene aria-hidden="true"></canvas>
+  <div class="hero__fallback" aria-hidden="true"></div>
+
+  <div class="shell shell--wide">
+    <div class="hero__grid">
+
+      {# ---------------- copy ---------------- #}
+      <div class="hero__copy">
+
+        <span class="badge badge--accent hero__badge" data-reveal data-accent="violet">
+          <i class="badge__dot"></i>
+          {{ hero.eyebrow }}
+        </span>
+
+        <h1 class="hero__title" data-hero-title>
+          {% for line in hero.headline_lines %}
+            <span class="hero__line">
+              <span class="hero__line-inner{% if line.accent %} u-grad{% endif %}"
+                    {% if line.split %}data-split{% endif %}>{{ line.text }}</span>
+            </span>
+          {% endfor %}
+        </h1>
+
+        <p class="hero__sub" data-reveal>{{ hero.subhead|safe }}</p>
+
+        <p class="hero__rotator" data-reveal>
+          <span>Right now, helping with</span>
+          <span class="hero__rotator-window" data-rotator>
+            {% for noun in hero.rotating_nouns %}
+              <span class="hero__rotator-word{% if forloop.first %} is-in{% endif %}">{{ noun }}</span>
+            {% endfor %}
+          </span>
+        </p>
+
+        <div class="hero__ctas" data-reveal>
+          <a class="btn btn--primary btn--lg" href="{{ hero.primary_cta.href }}" data-magnetic data-ripple>
+            <span class="btn__sheen" aria-hidden="true"></span>
+            <span class="btn__label">
+              {{ hero.primary_cta.label }}
+              <svg aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+            </span>
+          </a>
+          <a class="btn btn--ghost btn--lg" href="{{ hero.secondary_cta.href }}" data-magnetic>
+            <span class="btn__label">
+              <svg aria-hidden="true"><use href="#i-play"></use></svg>
+              {{ hero.secondary_cta.label }}
+            </span>
+          </a>
+        </div>
+
+        <div class="hero__ticker" data-reveal>
+          {% for item in hero.ticker %}
+            <div class="stat">
+              <span class="stat__value">
+                <span data-count-to="{{ item.value }}">0</span>{{ item.suffix }}
+              </span>
+              <span class="stat__label">{{ item.label }}</span>
+            </div>
+          {% endfor %}
+        </div>
+
+      </div>
+
+      {# ---------------- HUD ---------------- #}
+      <div class="u-relative" data-reveal>
+
+        <div class="hero__hud tilt" data-tilt>
+          <div class="hero__hud-bar">
+            <span class="hero__hud-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="hero__hud-title">course-chat · intro-to-python</span>
+          </div>
+
+          <div class="hero__hud-body" data-hud>
+            {% for row in hero_transcript %}
+              <div class="hero__line-item"
+                   data-role="{{ row.role }}"
+                   data-marker="{% if row.role == 'student' %}in{% elif row.role == 'system' %}log{% else %}out{% endif %}">
+                <span>{{ row.text }}</span>
+              </div>
+            {% endfor %}
+            <div class="hero__line-item is-in" data-role="system" data-marker="&gt;">
+              <span><span class="hero__caret" aria-hidden="true"></span></span>
+            </div>
+          </div>
+
+          <div class="hero__hud-foot">
+            <span class="badge badge--live"><i class="badge__dot"></i> streaming</span>
+            <span class="t-micro u-mono">openrouter ai · responding</span>
+          </div>
+        </div>
+
+        <span class="hero__orbit hero__orbit--a" data-accent="cyan" aria-hidden="true">
+          <svg><use href="#i-database"></use></svg> instant reply
+        </span>
+        <span class="hero__orbit hero__orbit--b" data-accent="amber" aria-hidden="true">
+          <svg><use href="#i-brain"></use></svg> AI-generated quiz
+        </span>
+        <span class="hero__orbit hero__orbit--c" data-accent="emerald" aria-hidden="true">
+          <svg><use href="#i-target"></use></svg> clear next steps
+        </span>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div class="hero__cue" aria-hidden="true">
+    <span class="hero__cue-rail"></span>
+    <span>scroll</span>
+  </div>
+
+</section>

@@ -1,0 +1,40 @@
+{% comment %}
+  Closing CTA.
+
+  Links straight into the real account system rather than a lead-capture
+  form — there's no waitlist here, registration already works.
+{% endcomment %}
+<section class="section cta" id="cta">
+  <div class="shell">
+    <div class="cta__panel" data-reveal>
+      <div class="cta__glow" aria-hidden="true"></div>
+
+      <span class="badge badge--accent" data-accent="violet">
+        <i class="badge__dot"></i>
+        {{ cta.eyebrow }}
+      </span>
+
+      <h2 class="cta__title">{{ cta.title }}</h2>
+      <p class="cta__body">{{ cta.body }}</p>
+
+      <div class="row row--center">
+        <a class="btn btn--accent btn--lg" href="{% url 'register' %}" data-ripple data-magnetic>
+          <span class="btn__sheen" aria-hidden="true"></span>
+          <span class="btn__label">
+            Create your account
+            <svg aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost btn--lg" href="{% url 'login' %}" data-magnetic>
+          <span class="btn__label">Log in</span>
+        </a>
+      </div>
+
+      <p class="cta__reassure">
+        <svg aria-hidden="true"><use href="#i-shield"></use></svg>
+        {{ cta.reassurance }}
+      </p>
+
+    </div>
+  </div>
+</section>

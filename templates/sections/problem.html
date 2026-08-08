@@ -1,0 +1,89 @@
+{% comment %}
+  The problem section.
+
+  A deliberately unglamorous gradebook panel on the left against the diagnosis
+  panel on the right. The visual argument is the whole point: the left panel
+  gets no glass, no glow and no accent colour, because it is the thing being
+  criticised.
+{% endcomment %}
+<section class="section" id="problem">
+  <div class="shell">
+
+    <header class="section__head" data-reveal>
+      <span class="eyebrow">{{ problem.eyebrow }}</span>
+      <h2 class="t-h2">{{ problem.title|safe }}</h2>
+      <p class="t-lede">{{ problem.lede }}</p>
+    </header>
+
+    <div class="problem__compare">
+
+      {# ------------- before ------------- #}
+      <div class="gradebook" data-reveal>
+        <div class="gradebook__head">
+          <span class="gradebook__label">{{ problem.before.label }}</span>
+          <span class="gradebook__kicker">{{ problem.before.kicker }}</span>
+        </div>
+
+        <div class="gradebook__rows">
+          {% for row in problem.before.rows %}
+            <div class="gradebook__cell" data-mark="{{ row.mark }}">
+              <svg aria-hidden="true">
+                <use href="{% if row.mark == 'correct' %}#i-check-circle{% else %}#i-x-circle{% endif %}"></use>
+              </svg>
+              <span>{{ row.q }}</span>
+              <span class="u-sr">{{ row.mark }}</span>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="gradebook__verdict">
+          <span>{{ problem.before.verdict }}</span>
+        </div>
+        <p class="gradebook__aside">{{ problem.before.aside }}</p>
+      </div>
+
+      {# ------------- arrow ------------- #}
+      <div class="problem__arrow" aria-hidden="true" data-reveal>
+        <span class="problem__arrow-icon">
+          <svg><use href="#i-arrow-right"></use></svg>
+        </span>
+        <span class="problem__arrow-word">same data</span>
+      </div>
+
+      {# ------------- after ------------- #}
+      <div class="verdict" data-reveal data-accent="violet">
+        <div class="verdict__head">
+          <span class="gradebook__label">{{ problem.after.label }}</span>
+          <span class="badge badge--accent">{{ problem.after.kicker }}</span>
+        </div>
+
+        <p class="verdict__headline">{{ problem.after.headline }}</p>
+        <p class="verdict__body">{{ problem.after.body }}</p>
+
+        <div class="verdict__group">
+          <span class="verdict__group-label">Evidence · click-through in the app</span>
+          <div class="verdict__chips">
+            {% for e in problem.after.evidence %}
+              <span class="chip chip--evidence">{{ e }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="verdict__group">
+          <span class="verdict__group-label">This bug will also corrupt</span>
+          <div class="verdict__chips">
+            {% for tag in problem.after.spread %}
+              <span class="chip chip--tag">{{ tag }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <p class="verdict__action">
+          <svg aria-hidden="true"><use href="#i-check-circle"></use></svg>
+          <span>{{ problem.after.action }}</span>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>

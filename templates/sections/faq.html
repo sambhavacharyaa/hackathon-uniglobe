@@ -1,0 +1,59 @@
+{% comment %}
+  FAQ accordion.
+
+  Panels use `grid-template-rows: 0fr -> 1fr`, which animates to intrinsic
+  height without the max-height guesswork. Buttons carry aria-expanded and
+  aria-controls; the first item is open on load so the section never reads as
+  an empty list of headings.
+{% endcomment %}
+<section class="section" id="faq">
+  <div class="shell">
+
+    <div class="faq__layout">
+
+      <aside class="faq__aside" data-reveal>
+        <span class="eyebrow">Objections, answered</span>
+        <h2 class="t-h3">The questions judges actually ask</h2>
+        <p class="t-small">
+          Including the sharp one about whether this is just a chat window with a
+          database bolted on. It is the fair question, and it has a real answer.
+        </p>
+        <span class="section__rule" role="presentation"></span>
+        <div class="stack stack-sm">
+          <p class="t-micro">Still not answered?</p>
+          <a class="link" href="#cta">
+            Ask us directly
+            <svg aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </a>
+        </div>
+      </aside>
+
+      <div class="faq__list" data-faq data-reveal>
+        {% for item in faq %}
+          <div class="faq__item">
+            <h3>
+              <button class="faq__trigger"
+                      type="button"
+                      data-faq-trigger
+                      id="faq-t-{{ forloop.counter }}"
+                      aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}"
+                      aria-controls="faq-p-{{ forloop.counter }}">
+                <span class="faq__q">{{ item.q }}</span>
+                <span class="faq__sign" aria-hidden="true"></span>
+              </button>
+            </h3>
+            <div class="faq__panel{% if forloop.first %} is-open{% endif %}"
+                 id="faq-p-{{ forloop.counter }}"
+                 role="region"
+                 aria-labelledby="faq-t-{{ forloop.counter }}">
+              <div class="faq__panel-inner">
+                <p class="faq__a">{{ item.a }}</p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+</section>

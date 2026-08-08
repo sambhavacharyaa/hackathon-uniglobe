@@ -1,0 +1,138 @@
+{% load static %}<!doctype html>
+<html lang="en" data-theme="dark" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#060913" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+
+  <title>{% block title %}{{ SITE_NAME }} — {{ SITE_TAGLINE }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{{ SITE_DESCRIPTION }}{% endblock %}">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ SITE_NAME }} — {{ SITE_TAGLINE }}">
+  <meta property="og:description" content="{{ SITE_DESCRIPTION }}">
+  <meta name="twitter:card" content="summary_large_image">
+
+  {# Inline SVG favicon: no extra request, scales, and theme-independent. #}
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237c6bff'/%3E%3Cpath d='M7 22l6-7 4 4 8-9' stroke='white' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+  {# Fonts. preconnect first so the CSS request starts a round-trip earlier. #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+  <link rel="stylesheet" href="{% static 'css/landing_index.css' %}">
+  <link rel="stylesheet" href="{% static 'css/sections.css' %}">
+  {% block extra_css %}{% endblock %}
+
+  {% comment %}
+    Boot script — runs before first paint on purpose.
+
+    It resolves the theme from storage or the OS so there is no flash of the
+    wrong palette, swaps `no-js` for `js` so the CSS reveal rules know an
+    engine is present, records the scrollbar width for the scroll-lock, and
+    generates the grain tile as a data URI. Nothing here can throw: the whole
+    body is wrapped, and a failure leaves the page in its perfectly usable
+    no-js state.
+  {% endcomment %}
+  <script>
+    (function () {
+      var d = document.documentElement;
+      try {
+        d.classList.remove('no-js');
+        d.classList.add('js');
+
+        var stored = null;
+        try { stored = localStorage.getItem('skillup-theme'); } catch (e) { stored = null; }
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        d.setAttribute('data-theme', stored === 'light' || stored === 'dark' ? stored : (prefersLight ? 'light' : 'dark'));
+
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduce) { d.classList.add('reduced-motion'); }
+
+        var sw = window.innerWidth - d.clientWidth;
+        d.style.setProperty('--scrollbar-w', (sw > 0 ? sw : 0) + 'px');
+
+        var grain = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E\")";
+        d.style.setProperty('--grain-tile', grain);
+      } catch (err) {
+        /* Never let the boot script break the page. */
+        d.classList.remove('no-js');
+        d.classList.add('js');
+      }
+    })();
+  </script>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  {% include 'partials/icons.html' %}
+
+  {% comment %}
+    Ambient background. Fixed, pointer-transparent, sits behind everything.
+  {% endcomment %}
+  <div class="bg-stack" aria-hidden="true">
+    <div class="bg-grid"></div>
+    <div class="bg-aurora"><span></span><span></span><span></span><span></span></div>
+    <div class="bg-vignette"></div>
+    <div class="bg-grain"></div>
+    <div class="bg-scan"></div>
+  </div>
+
+  {% include 'partials/preloader.html' %}
+  {% include 'partials/cursor.html' %}
+
+  <div class="scroll-progress" aria-hidden="true">
+    <div class="scroll-progress__bar" data-scroll-bar></div>
+  </div>
+
+  {% include 'partials/nav.html' %}
+  {% include 'partials/drawer.html' %}
+  {% include 'partials/palette.html' %}
+
+  <main id="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include 'partials/footer.html' %}
+
+  <button class="to-top" data-to-top type="button" aria-label="Back to top">
+    <svg class="to-top__ring" viewBox="0 0 48 48" aria-hidden="true">
+      <circle class="track" cx="24" cy="24" r="22"></circle>
+      <circle class="bar" cx="24" cy="24" r="22"></circle>
+    </svg>
+    <svg aria-hidden="true"><use href="#i-arrow-up"></use></svg>
+  </button>
+
+  <div class="toast-host" data-toast-host role="status" aria-live="polite"></div>
+
+  {% comment %}
+    Third-party libraries load from CDN with `defer`, so they never block
+    parsing. Every one of them is optional: index.js checks for `window.gsap`
+    and `window.THREE` and takes a documented fallback path if either is
+    missing, which is why a blocked CDN degrades the page instead of breaking
+    it.
+
+    three.js is pinned to r149 on purpose: it is the last release whose UMD
+    bundle loads from a plain <script> tag without printing a deprecation
+    warning to the console, and it supports every feature scene.js uses
+    (BufferGeometry, ShaderMaterial, Points, Icosahedron/Torus geometry).
+    Using ES modules here would mean an import map and a module CORS
+    handshake for no gain, since the scene is one self-contained file.
+  {% endcomment %}
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+
+  <script defer src="{% static 'js/scene.js' %}"></script>
+  <script defer src="{% static 'js/motion.js' %}"></script>
+  <script defer src="{% static 'js/landing_index.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
