@@ -12,31 +12,51 @@
     <a href="{% url 'catalog' %}" class="btn btn-primary">Browse courses</a>
 </div>
 
+{% if continue_course %}
+<div class="section">
+    <a href="{% url 'course-detail' continue_course.course.slug %}" class="ai-card" style="text-decoration:none; color:inherit; display:block;">
+        <span class="ai-card-label">▶ Continue learning</span>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:var(--space-4); flex-wrap:wrap;">
+            <div>
+                <div style="font-family:var(--font-display); font-weight:700; font-size:var(--text-lg); color:var(--text-strong); margin-bottom:var(--space-1);">{{ continue_course.course.title }}</div>
+                <div class="list-row-meta">by {{ continue_course.course.instructor.first_name|default:continue_course.course.instructor.email }}</div>
+            </div>
+            <div style="min-width:180px;">
+                <div class="meter">
+                    <div class="meter-track"><div class="meter-fill" style="width: {{ continue_course.progress_percent }}%;"></div></div>
+                    <span class="meter-label">{{ continue_course.progress_percent }}%</span>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>
+{% endif %}
+
 <div class="section">
     <div class="stat-grid">
-        <div class="stat-tile">
+        <a href="#my-courses" class="stat-tile">
             <span class="stat-label">Enrolled courses</span>
             <span class="stat-value">{{ enrolled_count }}</span>
-        </div>
-        <div class="stat-tile">
+        </a>
+        <a href="#my-courses" class="stat-tile">
             <span class="stat-label">Completed</span>
             <span class="stat-value">{{ completed_count }}</span>
             <span class="stat-hint">100% of lessons done</span>
-        </div>
-        <div class="stat-tile">
+        </a>
+        <a href="#activity" class="stat-tile">
             <span class="stat-label">Average grade</span>
             <span class="stat-value">{% if avg_grade is not None %}{{ avg_grade }}%{% else %}—{% endif %}</span>
-        </div>
-        <div class="stat-tile">
+        </a>
+        <a href="#upcoming" class="stat-tile">
             <span class="stat-label">Due soon</span>
             <span class="stat-value">{{ upcoming|length }}</span>
-        </div>
+        </a>
     </div>
 </div>
 
 <div class="dashboard-grid">
     <div>
-        <div class="section">
+        <div class="section" id="my-courses">
             <div class="section-header">
                 <h2>My courses</h2>
             </div>
@@ -65,10 +85,30 @@
                 </div>
             {% endif %}
         </div>
+
+        <div class="section" id="activity">
+            <div class="section-header"><h2>Recent activity</h2></div>
+            {% if activity %}
+                {% for item in activity %}
+                    <a href="{{ item.url }}" class="list-row" style="text-decoration:none; color:inherit;">
+                        <div class="list-row-main">
+                            <div class="avatar" style="font-size:1.1rem;">{{ item.icon }}</div>
+                            <div>
+                                <div class="list-row-title">{{ item.text }}</div>
+                                <div class="list-row-meta">{{ item.meta }} &middot; {{ item.timestamp|timesince }} ago</div>
+                            </div>
+                        </div>
+                        {% if item.badge %}<span class="badge {{ item.badge_class }}">{{ item.badge }}</span>{% endif %}
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>Nothing yet — complete a lesson or take a quiz to see activity here.</p></div>
+            {% endif %}
+        </div>
     </div>
 
     <div>
-        <div class="section">
+        <div class="section" id="upcoming">
             <div class="section-header"><h2>Upcoming assignments</h2></div>
             {% if upcoming %}
                 {% for item in upcoming %}
@@ -100,6 +140,16 @@
                 <span class="ai-card-label">✨ AI marksheet review</span>
                 <p style="margin-bottom: var(--space-3);">Upload your scores and get personalized improvement tips.</p>
                 <a href="{% url 'marksheet-upload' %}" class="btn btn-primary btn-sm">Upload marksheet</a>
+                <a href="{% url 'marksheet-list' %}" class="btn btn-ghost btn-sm">My reviews</a>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="ai-card">
+                <span class="ai-card-label">✨ AI answer sheet review</span>
+                <p style="margin-bottom: var(--space-3);">Photograph an exam paper and get specific tips for next time.</p>
+                <a href="{% url 'answer-sheet-upload' %}" class="btn btn-primary btn-sm">Upload answer sheet</a>
+                <a href="{% url 'answer-sheet-list' %}" class="btn btn-ghost btn-sm">My reviews</a>
             </div>
         </div>
 

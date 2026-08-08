@@ -14,25 +14,35 @@
 
 <div class="section">
     <div class="stat-grid">
-        <div class="stat-tile">
+        <a href="#my-courses" class="stat-tile">
             <span class="stat-label">Courses</span>
             <span class="stat-value">{{ course_count }}</span>
-        </div>
-        <div class="stat-tile">
+        </a>
+        <a href="#my-courses" class="stat-tile">
             <span class="stat-label">Total students</span>
             <span class="stat-value">{{ total_students }}</span>
-        </div>
-        <div class="stat-tile">
+        </a>
+        <a href="#needs-grading" class="stat-tile">
             <span class="stat-label">Needs grading</span>
             <span class="stat-value">{{ ungraded_count }}</span>
             {% if ungraded_count > 0 %}<span class="stat-hint">across all courses</span>{% endif %}
-        </div>
+        </a>
+        <a href="{% url 'marksheet-review-queue' %}" class="stat-tile">
+            <span class="stat-label">Marksheets to approve</span>
+            <span class="stat-value">{{ pending_marksheets }}</span>
+            {% if pending_marksheets > 0 %}<span class="stat-hint">self-reported scores, awaiting you</span>{% endif %}
+        </a>
+        <a href="#analytics" class="stat-tile">
+            <span class="stat-label">Avg quiz score</span>
+            <span class="stat-value">{% if avg_quiz_score is not None %}{{ avg_quiz_score }}%{% else %}—{% endif %}</span>
+            <span class="stat-hint">see full analytics</span>
+        </a>
     </div>
 </div>
 
 <div class="dashboard-grid">
     <div>
-        <div class="section">
+        <div class="section" id="my-courses">
             <div class="section-header"><h2>My courses</h2></div>
             {% if courses %}
                 <div class="course-grid">
@@ -61,10 +71,50 @@
                 </div>
             {% endif %}
         </div>
+
+        {% if course_performance %}
+        <div class="section">
+            <div class="section-header"><h2>Course performance</h2></div>
+            {% for cp in course_performance %}
+                <a href="{% url 'course-detail' cp.course.slug %}" class="list-row" style="text-decoration:none; color:inherit;">
+                    <div class="list-row-main">
+                        <div>
+                            <div class="list-row-title">{{ cp.course.title }}</div>
+                            <div class="list-row-meta">{{ cp.student_count }} student{{ cp.student_count|pluralize }} &middot; average progress</div>
+                        </div>
+                    </div>
+                    <div class="meter" style="min-width:140px;">
+                        <div class="meter-track"><div class="meter-fill" style="width: {{ cp.avg_progress }}%;"></div></div>
+                        <span class="meter-label">{{ cp.avg_progress }}%</span>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="section">
+            <div class="section-header"><h2>Recent activity</h2></div>
+            {% if activity %}
+                {% for item in activity %}
+                    <a href="{{ item.url }}" class="list-row" style="text-decoration:none; color:inherit;">
+                        <div class="list-row-main">
+                            <div class="avatar" style="font-size:1.1rem;">{{ item.icon }}</div>
+                            <div>
+                                <div class="list-row-title">{{ item.text }}</div>
+                                <div class="list-row-meta">{{ item.meta }} &middot; {{ item.timestamp|timesince }} ago</div>
+                            </div>
+                        </div>
+                        {% if item.badge %}<span class="badge {{ item.badge_class }}">{{ item.badge }}</span>{% endif %}
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>Nothing yet — activity shows up as students engage with your courses.</p></div>
+            {% endif %}
+        </div>
     </div>
 
     <div>
-        <div class="section">
+        <div class="section" id="needs-grading">
             <div class="section-header"><h2>Needs grading</h2></div>
             {% if ungraded_submissions %}
                 {% for s in ungraded_submissions %}
@@ -81,6 +131,112 @@
                 {% endfor %}
             {% else %}
                 <div class="empty-state"><p>Nothing to grade. Nice work.</p></div>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <div class="ai-card">
+                <span class="ai-card-label">✨ Quick actions</span>
+                <p style="margin-bottom: var(--space-3);">Jump straight to the things you do most.</p>
+                <div style="display:flex; flex-direction:column; gap: var(--space-2);">
+                    <a href="{% url 'create-course' %}" class="btn btn-secondary btn-sm btn-block">+ New course</a>
+                    <a href="{% url 'marksheet-review-queue' %}" class="btn btn-secondary btn-sm btn-block">Review marksheets</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section" id="analytics">
+    <div class="section-header">
+        <h2>📊 Analytics</h2>
+        <p class="page-subtitle" style="margin:0;">Across every course you teach</p>
+    </div>
+
+    <div class="stat-grid" style="margin-bottom: var(--space-5);">
+        <div class="stat-tile">
+            <span class="stat-label">Quiz attempts</span>
+            <span class="stat-value">{{ total_quiz_attempts }}</span>
+        </div>
+        <div class="stat-tile">
+            <span class="stat-label">Avg quiz score</span>
+            <span class="stat-value">{% if avg_quiz_score is not None %}{{ avg_quiz_score }}%{% else %}—{% endif %}</span>
+        </div>
+        <div class="stat-tile">
+            <span class="stat-label">Approved marksheets</span>
+            <span class="stat-value">{{ total_approved_marksheets }}</span>
+        </div>
+        <div class="stat-tile">
+            <span class="stat-label">Avg marksheet score</span>
+            <span class="stat-value">{% if avg_marksheet_score is not None %}{{ avg_marksheet_score }}%{% else %}—{% endif %}</span>
+        </div>
+    </div>
+
+    {% if total_quiz_attempts > 0 %}
+    <div class="section">
+        <div class="section-header"><h3 class="t-h3" style="margin:0; font-family:var(--font-display); font-weight:700; font-size:var(--text-base);">Quiz score distribution</h3></div>
+        <div class="stat-grid">
+            <div class="stat-tile" style="border-color: color-mix(in srgb, var(--color-good) 35%, transparent);">
+                <span class="stat-label">🟢 Strong &middot; 70%+</span>
+                <span class="stat-value">{{ tier_counts.good }}</span>
+                <span class="stat-hint">of {{ total_quiz_attempts }} attempt{{ total_quiz_attempts|pluralize }}</span>
+            </div>
+            <div class="stat-tile" style="border-color: color-mix(in srgb, var(--color-warning) 35%, transparent);">
+                <span class="stat-label">🟡 Developing &middot; 40&ndash;69%</span>
+                <span class="stat-value">{{ tier_counts.warning }}</span>
+                <span class="stat-hint">of {{ total_quiz_attempts }} attempt{{ total_quiz_attempts|pluralize }}</span>
+            </div>
+            <div class="stat-tile" style="border-color: color-mix(in srgb, var(--color-critical) 35%, transparent);">
+                <span class="stat-label">🔴 Needs support &middot; &lt;40%</span>
+                <span class="stat-value">{{ tier_counts.critical }}</span>
+                <span class="stat-hint">of {{ total_quiz_attempts }} attempt{{ total_quiz_attempts|pluralize }}</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="dashboard-grid">
+        <div>
+            <div class="section-header"><h3 class="t-h3" style="margin:0; font-family:var(--font-display); font-weight:700; font-size:var(--text-base);">Quiz results by quiz</h3></div>
+            {% if quiz_stats %}
+                {% for q in quiz_stats %}
+                    <div class="list-row">
+                        <div class="list-row-main">
+                            <div>
+                                <div class="list-row-title">{{ q.title }}</div>
+                                <div class="list-row-meta">{{ q.course }} &middot; {{ q.attempt_count }} attempt{{ q.attempt_count|pluralize }}</div>
+                            </div>
+                        </div>
+                        <div class="meter" style="min-width:150px;">
+                            <div class="meter-track"><div class="meter-fill meter-fill-{{ q.tier }}" style="width: {{ q.avg_score }}%;"></div></div>
+                            <span class="meter-label">{{ q.avg_score }}%</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>No quiz attempts yet — generate a quiz on a lesson to get started.</p></div>
+            {% endif %}
+        </div>
+
+        <div>
+            <div class="section-header"><h3 class="t-h3" style="margin:0; font-family:var(--font-display); font-weight:700; font-size:var(--text-base);">Marksheet results by subject</h3></div>
+            {% if marksheet_stats %}
+                {% for s in marksheet_stats %}
+                    <div class="list-row">
+                        <div class="list-row-main">
+                            <div>
+                                <div class="list-row-title">{{ s.subject }}</div>
+                                <div class="list-row-meta">{{ s.count }} score{{ s.count|pluralize }} across approved marksheets</div>
+                            </div>
+                        </div>
+                        <div class="meter" style="min-width:150px;">
+                            <div class="meter-track"><div class="meter-fill meter-fill-{{ s.tier }}" style="width: {{ s.avg_score }}%;"></div></div>
+                            <span class="meter-label">{{ s.avg_score }}%</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>No approved marksheets yet.</p></div>
             {% endif %}
         </div>
     </div>

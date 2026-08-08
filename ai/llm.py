@@ -5,12 +5,15 @@ Every public function raises LLMError on failure (missing key, network
 error, malformed response) so views can catch one exception type and show a
 friendly message instead of a 500.
 """
+import base64
+import io
 import json
 import logging
 import re
 
 from django.conf import settings
 from openai import OpenAI
+from PIL import Image
 
 logger = logging.getLogger(__name__)
 
@@ -46,12 +49,12 @@ def _require_configured():
         )
 
 
-def _chat(messages):
+def _chat(messages, model=None):
     _require_configured()
     client = _get_client()
     try:
         response = client.chat.completions.create(
-            model=settings.OPENROUTER_MODEL,
+            model=model or settings.OPENROUTER_MODEL,
             messages=messages,
         )
     except Exception as exc:
@@ -82,13 +85,13 @@ def _extract_json(text):
         raise
 
 
-def _generate_json(prompt, system_instruction=None):
+def _generate_json(prompt, system_instruction=None, model=None):
     messages = []
     if system_instruction:
         messages.append({"role": "system", "content": system_instruction})
     messages.append({"role": "user", "content": prompt})
 
-    text = _chat(messages)
+    text = _chat(messages, model=model)
     try:
         return _extract_json(text)
     except (ValueError, TypeError) as exc:
@@ -138,6 +141,62 @@ Write exactly {num_questions} multiple-choice questions. Respond with ONLY a JSO
 }}
 Each question must have exactly 4 choices, and correct_index must be an integer from 0 to 3."""
     return _generate_json(prompt)
+
+
+def _image_to_data_uri(image_bytes, max_dimension=1600, quality=85):
+    """Downscale to a sane size and re-encode as JPEG before sending to the
+    API — keeps the request fast and well under any payload limit regardless
+    of how large the original photo was."""
+    try:
+        img = Image.open(io.BytesIO(image_bytes))
+        img = img.convert("RGB")
+        if max(img.size) > max_dimension:
+            img.thumbnail((max_dimension, max_dimension), Image.LANCZOS)
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=quality)
+        encoded = base64.b64encode(buf.getvalue()).decode()
+    except Exception as exc:
+        raise LLMError("That image couldn't be read. Try a different photo or format.") from exc
+    return f"data:image/jpeg;base64,{encoded}"
+
+
+def review_answer_sheet(image_bytes, subject):
+    """Read a photographed/scanned exam answer sheet and review it.
+
+    Requires OPENROUTER_VISION_MODEL — most free text models can't see
+    images at all, so this always uses the vision-specific model setting
+    rather than the default OPENROUTER_MODEL.
+    """
+    _require_configured()
+    data_uri = _image_to_data_uri(image_bytes)
+
+    prompt = f"""You are an experienced exam grader reviewing a student's handwritten or printed answer sheet for: {subject}.
+
+Read every question and answer visible in the image carefully, including any diagrams or working shown. Respond with ONLY a JSON object (no markdown fences, no extra text) of this exact shape:
+{{
+  "transcription": "a brief plain-text summary of what was written, question by question",
+  "overall_feedback": "2-3 sentence overview of how the student performed overall",
+  "strengths": ["short phrase", "short phrase"],
+  "mistakes": ["short phrase describing a specific error found, referencing which question"],
+  "improvement_suggestions": "A warm, encouraging, SPECIFIC paragraph on what to study or practice before the next exam, directly referencing the mistakes found in this answer sheet."
+}}
+If the image is too unclear to read, say so honestly in "overall_feedback" and leave the other fields as empty lists/strings rather than guessing."""
+
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url", "image_url": {"url": data_uri}},
+            ],
+        }
+    ]
+    text = _chat(messages, model=settings.OPENROUTER_VISION_MODEL)
+    try:
+        return _extract_json(text)
+    except (ValueError, TypeError) as exc:
+        logger.exception("OpenRouter returned invalid JSON for answer sheet: %r", text)
+        raise LLMError("The AI returned an unexpected response. Please try again.") from exc
 
 
 def chat_reply(course, history, message):

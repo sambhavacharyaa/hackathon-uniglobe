@@ -189,3 +189,7 @@ OTP_RESEND_COOLDOWN_SECONDS = 60
 
 OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', '')
 OPENROUTER_MODEL = os.environ.get('OPENROUTER_MODEL', 'openai/gpt-oss-20b:free')
+# Used for the answer-sheet review feature — must be a vision-capable model
+# (accepts image_url content). Most text-only free models, including the
+# default above, cannot read images.
+OPENROUTER_VISION_MODEL = os.environ.get('OPENROUTER_VISION_MODEL', 'google/gemma-4-26b-a4b-it:free')

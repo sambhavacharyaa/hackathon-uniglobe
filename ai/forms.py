@@ -1,6 +1,8 @@
 from django import forms
 from django.forms import formset_factory
 
+from ai.models import AnswerSheetReview
+
 
 class MarksheetEntryForm(forms.Form):
     subject = forms.CharField(
@@ -38,3 +40,29 @@ class MarksheetEntryForm(forms.Form):
 
 
 MarksheetFormSet = formset_factory(MarksheetEntryForm, extra=6)
+
+
+class MarksheetRejectForm(forms.Form):
+    reason = forms.CharField(
+        label="Reason",
+        widget=forms.Textarea(attrs={"rows": 2, "placeholder": "Why doesn't this look right? (shown to the student)"}),
+    )
+
+
+MAX_ANSWER_SHEET_SIZE = 10 * 1024 * 1024  # 10MB
+
+
+class AnswerSheetUploadForm(forms.ModelForm):
+    class Meta:
+        model = AnswerSheetReview
+        fields = ["subject", "image"]
+        widgets = {
+            "subject": forms.TextInput(attrs={"placeholder": "e.g. Biology Midterm"}),
+            "image": forms.ClearableFileInput(attrs={"accept": "image/*"}),
+        }
+
+    def clean_image(self):
+        image = self.cleaned_data["image"]
+        if image.size > MAX_ANSWER_SHEET_SIZE:
+            raise forms.ValidationError("That image is too large — please keep it under 10MB.")
+        return image

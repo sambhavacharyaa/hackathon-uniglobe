@@ -8,6 +8,7 @@ django = "*"
 python-dotenv = "*"
 google-genai = "*"
 openai = "*"
+pillow = "*"
 
 [dev-packages]
 

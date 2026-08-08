@@ -31,7 +31,17 @@
             </div>
         </div>
 
-        {% if marksheet.is_reviewed %}
+        {% if marksheet.is_pending %}
+            <div class="empty-state">
+                <p>⏳ Waiting for a teacher to approve these scores. The AI review runs automatically once approved.</p>
+            </div>
+        {% elif marksheet.is_rejected %}
+            <div class="empty-state">
+                <p><strong>This marksheet was rejected.</strong> {{ marksheet.rejection_reason }}</p>
+                {% if marksheet.reviewed_by %}<p class="help-text">— {{ marksheet.reviewed_by.first_name|default:marksheet.reviewed_by.email }}, {{ marksheet.reviewed_at|date:"M j, Y" }}</p>{% endif %}
+                <a href="{% url 'marksheet-upload' %}" class="btn btn-primary btn-sm">Upload a corrected marksheet</a>
+            </div>
+        {% elif marksheet.is_reviewed %}
             <div class="section">
                 <div class="section-header"><h2>AI feedback for you</h2></div>
                 <div class="ai-card">
@@ -42,21 +52,34 @@
             </div>
         {% elif marksheet.error %}
             <div class="empty-state">
-                <p>The AI review couldn't be completed: {{ marksheet.error }}</p>
-                <a href="{% url 'marksheet-upload' %}" class="btn btn-primary btn-sm">Try again</a>
+                <p>Approved, but the AI review couldn't be completed: {{ marksheet.error }}</p>
             </div>
         {% endif %}
     </div>
 
     <div>
-        {% if marksheet.is_reviewed %}
-            <div class="section">
-                <div class="section-header"><h2>Average</h2></div>
-                <div class="stat-tile">
-                    <span class="stat-label">Overall</span>
-                    <span class="stat-value">{{ marksheet.average_percent }}%</span>
-                </div>
+        <div class="section">
+            <div class="section-header"><h2>Status</h2></div>
+            {% if marksheet.is_pending %}
+                <span class="badge badge-warning">Pending approval</span>
+            {% elif marksheet.is_rejected %}
+                <span class="badge badge-critical">Rejected</span>
+            {% elif marksheet.is_reviewed %}
+                <span class="badge badge-good">Approved &amp; reviewed</span>
+            {% else %}
+                <span class="badge badge-good">Approved</span>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <div class="section-header"><h2>Average</h2></div>
+            <div class="stat-tile">
+                <span class="stat-label">Overall (self-reported)</span>
+                <span class="stat-value">{{ marksheet.average_percent }}%</span>
             </div>
+        </div>
+
+        {% if marksheet.is_reviewed %}
             {% if marksheet.strengths %}
                 <div class="section">
                     <div class="section-header"><h2>Strengths</h2></div>

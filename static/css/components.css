@@ -213,6 +213,180 @@ p {
     display: inline;
 }
 
+/* Sidebar (the app shell for logged-in pages) -------------------------------- */
+
+.app-shell {
+    display: flex;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 264px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding: var(--space-5) var(--space-4);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    background: var(--glass-bg-strong);
+    border-right: 1px solid var(--glass-border);
+    backdrop-filter: blur(var(--glass-blur-heavy));
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy));
+    z-index: 30;
+}
+
+.sidebar-brand {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-lg);
+    color: var(--text-strong);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+    padding: 0 var(--space-2);
+}
+
+.sidebar-brand span {
+    color: var(--color-primary);
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    flex: 1;
+}
+
+.sidebar-nav-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+    padding: var(--space-4) var(--space-2) var(--space-1);
+}
+
+.sidebar-nav-label:first-child {
+    padding-top: 0;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0.65rem 0.75rem;
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    transition: var(--transition-fast);
+}
+
+.sidebar-link:hover {
+    background: var(--color-surface-sunken);
+    color: var(--text-strong);
+}
+
+.sidebar-link.is-active {
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+}
+
+
+.sidebar-footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+}
+
+.sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0 var(--space-2);
+}
+
+.sidebar-user-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    align-items: flex-start;
+}
+
+.sidebar-user-email {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 160px;
+}
+
+.app-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.mobile-topbar {
+    display: none;
+}
+
+.sidebar-backdrop {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    .mobile-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-3) var(--space-4);
+        background: var(--glass-bg-strong);
+        border-bottom: 1px solid var(--glass-border);
+        position: sticky;
+        top: 0;
+        z-index: 25;
+        backdrop-filter: blur(var(--glass-blur-heavy));
+        -webkit-backdrop-filter: blur(var(--glass-blur-heavy));
+    }
+
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+        transition: transform var(--transition-base);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .sidebar.is-open {
+        transform: translateX(0);
+    }
+
+    .sidebar-backdrop.is-open {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: var(--scrim);
+        z-index: 29;
+    }
+
+    .app-shell {
+        display: block;
+    }
+}
+
 /* Layout ------------------------------------------------------------------- */
 
 .container {
@@ -323,7 +497,17 @@ p {
     opacity: 0.5;
 }
 
-.stat-tile:hover {
+/* Only an <a class="stat-tile"> gets the hover-lift affordance — a plain
+   <div> stat tile (e.g. a single read-only figure) should never look
+   clickable when it isn't. */
+a.stat-tile {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    cursor: pointer;
+}
+
+a.stat-tile:hover {
     transform: translateY(-3px);
     border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
     box-shadow: var(--glow-primary);
@@ -399,6 +583,13 @@ p {
     text-align: right;
     font-variant-numeric: tabular-nums;
 }
+
+/* Tier-colored fills for analytics bars — same meter, but the color itself
+   carries the good/warning/critical read, reusing the reserved status
+   palette rather than the default brand gradient. */
+.meter-fill-good { background: linear-gradient(90deg, var(--color-good), color-mix(in srgb, var(--color-good) 55%, var(--accent-emerald))); }
+.meter-fill-warning { background: linear-gradient(90deg, var(--color-warning), color-mix(in srgb, var(--color-warning) 55%, var(--amber-300))); }
+.meter-fill-critical { background: linear-gradient(90deg, var(--color-critical), color-mix(in srgb, var(--color-critical) 55%, var(--rose-300))); }
 
 /* Badges / status pills -------------------------------------------------------------- */
 
@@ -571,19 +762,31 @@ p {
 .form-field select {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 1px solid var(--line-strong);
+    /* A visible frosted-glass fill, not the same dark tone as the card
+       behind it — color-mix against --text keeps this legible in both
+       light and dark mode without a separate override per theme. */
+    border: 1px solid color-mix(in srgb, var(--text) 22%, transparent);
     border-radius: var(--radius-input);
     font-size: var(--text-base);
     font-family: inherit;
-    background: var(--color-surface-sunken);
+    background: color-mix(in srgb, var(--text) 7%, var(--glass-bg-strong));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     color: var(--color-text);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent);
     transition: var(--transition-fast);
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+    color: var(--text-faint);
 }
 
 .form-field input:hover,
 .form-field textarea:hover,
 .form-field select:hover {
-    border-color: var(--line-accent);
+    border-color: color-mix(in srgb, var(--text) 34%, transparent);
+    background: color-mix(in srgb, var(--text) 10%, var(--glass-bg-strong));
 }
 
 .form-field input:focus,
@@ -1304,13 +1507,21 @@ table.data-table tr:hover td {
     flex: 1;
     resize: none;
     padding: 0.7rem 1rem;
-    border: 1px solid var(--line-strong);
+    border: 1px solid color-mix(in srgb, var(--text) 22%, transparent);
     border-radius: var(--radius-input);
     font-family: inherit;
     font-size: var(--text-sm);
-    background: var(--color-surface-sunken);
+    background: color-mix(in srgb, var(--text) 7%, var(--glass-bg-strong));
     color: var(--color-text);
     max-height: 120px;
+}
+
+.chat-form textarea::placeholder {
+    color: var(--text-faint);
+}
+
+.chat-form textarea:hover {
+    border-color: color-mix(in srgb, var(--text) 34%, transparent);
 }
 
 .chat-form textarea:focus {

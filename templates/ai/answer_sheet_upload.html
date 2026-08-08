@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Upload answer sheet{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Upload your answer sheet</h1>
+        <p class="page-subtitle">Take a clear photo of your exam paper — AI will read it and suggest what to improve.</p>
+    </div>
+    <a href="{% url 'answer-sheet-list' %}" class="btn btn-secondary">My reviews</a>
+</div>
+
+<div class="card" style="max-width: 560px;">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<ul class="errorlist">{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+
+        <div class="form-field">
+            <label for="{{ form.subject.id_for_label }}">{{ form.subject.label }}</label>
+            {{ form.subject }}
+            {% for error in form.subject.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="form-field">
+            <label for="{{ form.image.id_for_label }}">Photo of your answer sheet</label>
+            {{ form.image }}
+            <p class="help-text">JPEG or PNG, up to 10MB. Make sure the writing is in focus and well-lit.</p>
+            {% for error in form.image.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Review with AI</button>
+    </form>
+</div>
+{% endblock %}

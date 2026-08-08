@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load course_extras %}
+
+{% block title %}Marksheet reviews{% endblock %}
+{% block container_class %}container-wide{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Marksheet approvals</h1>
+        <p class="page-subtitle">Scores are self-reported by students — approve them before the AI reviews them.</p>
+    </div>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">&larr; Dashboard</a>
+</div>
+
+<div class="section">
+    <div class="section-header"><h2>Pending ({{ pending|length }})</h2></div>
+    {% if pending %}
+        {% for m in pending %}
+            <div class="card">
+                <div class="list-row" style="border:none; padding:0; margin-bottom: var(--space-3);">
+                    <div class="list-row-main">
+                        <div class="avatar">{{ m.student.first_name|default:m.student.email|slice:":1" }}</div>
+                        <div>
+                            <div class="list-row-title">{{ m.student.first_name }} {{ m.student.last_name }}</div>
+                            <div class="list-row-meta">{{ m.student.email }} &middot; submitted {{ m.created_at|date:"M j, Y" }}</div>
+                        </div>
+                    </div>
+                    <span class="badge badge-neutral">{{ m.average_percent }}% claimed avg</span>
+                </div>
+
+                <div class="table-wrap" style="margin-bottom: var(--space-4);">
+                    <table class="data-table">
+                        <thead><tr><th>Subject</th><th>Score</th><th>%</th></tr></thead>
+                        <tbody>
+                            {% for e in m.entries %}
+                                <tr>
+                                    <td>{{ e.subject }}</td>
+                                    <td>{{ e.score }}/{{ e.max_score }}</td>
+                                    <td>{% widthratio e.score e.max_score 100 %}%</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <form method="post" action="{% url 'marksheet-approve' m.id %}" style="margin-bottom: var(--space-3);">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-sm">✓ Approve &amp; run AI review</button>
+                </form>
+
+                {% with rform=reject_forms|get_item:m.id %}
+                <form method="post" action="{% url 'marksheet-reject' m.id %}" style="display:flex; gap: var(--space-2); align-items: flex-start;">
+                    {% csrf_token %}
+                    <div class="form-field" style="flex:1; margin-bottom:0;">
+                        {{ rform.reason }}
+                    </div>
+                    <button type="submit" class="btn btn-secondary btn-sm" style="flex-shrink:0;">✗ Reject</button>
+                </form>
+                {% endwith %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state"><p>Nothing waiting on you. Nice work.</p></div>
+    {% endif %}
+</div>
+
+{% if recent %}
+<div class="section">
+    <div class="section-header"><h2>Recently reviewed</h2></div>
+    {% for m in recent %}
+        <div class="list-row">
+            <div class="list-row-main">
+                <div class="avatar">{{ m.student.first_name|default:m.student.email|slice:":1" }}</div>
+                <div>
+                    <div class="list-row-title">{{ m.student.first_name }} {{ m.student.last_name }}</div>
+                    <div class="list-row-meta">
+                        {{ m.reviewed_at|date:"M j, Y" }}
+                        {% if m.reviewed_by %}&middot; by {{ m.reviewed_by.first_name|default:m.reviewed_by.email }}{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if m.is_rejected %}
+                <span class="badge badge-critical">Rejected</span>
+            {% elif m.is_reviewed %}
+                <span class="badge badge-good">Approved &middot; {{ m.average_percent }}%</span>
+            {% else %}
+                <span class="badge badge-warning">Approved, AI failed</span>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

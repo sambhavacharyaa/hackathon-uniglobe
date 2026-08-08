@@ -1,13 +1,21 @@
 from django.contrib import admin
 
-from ai.models import ChatMessage, ChatThread, Marksheet
+from ai.models import AnswerSheetReview, ChatMessage, ChatThread, Marksheet
 
 
 @admin.register(Marksheet)
 class MarksheetAdmin(admin.ModelAdmin):
-    list_display = ("student", "average_percent", "is_reviewed", "created_at")
-    list_filter = ("is_reviewed",)
+    list_display = ("student", "average_percent", "status", "is_reviewed", "reviewed_by", "created_at")
+    list_filter = ("status", "is_reviewed")
     search_fields = ("student__email",)
+    readonly_fields = ("created_at",)
+
+
+@admin.register(AnswerSheetReview)
+class AnswerSheetReviewAdmin(admin.ModelAdmin):
+    list_display = ("student", "subject", "is_reviewed", "created_at")
+    list_filter = ("is_reviewed",)
+    search_fields = ("student__email", "subject")
     readonly_fields = ("created_at",)
 
 

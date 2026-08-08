@@ -6,7 +6,7 @@
 <div class="page-header">
     <div>
         <h1>Marksheet reviews</h1>
-        <p class="page-subtitle">AI-reviewed academic performance history.</p>
+        <p class="page-subtitle">Teacher-approved, AI-reviewed academic performance history.</p>
     </div>
     <a href="{% url 'marksheet-upload' %}" class="btn btn-primary">+ Upload marksheet</a>
 </div>
@@ -20,12 +20,16 @@
                     <div class="list-row-meta">{{ m.entries|length }} subject{{ m.entries|length|pluralize }}</div>
                 </div>
             </div>
-            {% if m.is_reviewed %}
+            {% if m.is_pending %}
+                <span class="badge badge-warning">Pending approval</span>
+            {% elif m.is_rejected %}
+                <span class="badge badge-critical">Rejected</span>
+            {% elif m.is_reviewed %}
                 <span class="badge badge-good">{{ m.average_percent }}% avg</span>
             {% elif m.error %}
-                <span class="badge badge-critical">Review failed</span>
+                <span class="badge badge-critical">AI review failed</span>
             {% else %}
-                <span class="badge badge-neutral">Pending</span>
+                <span class="badge badge-neutral">Approved</span>
             {% endif %}
         </a>
     {% endfor %}

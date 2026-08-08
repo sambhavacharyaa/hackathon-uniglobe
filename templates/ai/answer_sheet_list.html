@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}My answer sheet reviews{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Answer sheet reviews</h1>
+        <p class="page-subtitle">AI-reviewed exam papers, with suggestions for next time.</p>
+    </div>
+    <a href="{% url 'answer-sheet-upload' %}" class="btn btn-primary">+ Upload answer sheet</a>
+</div>
+
+{% if reviews %}
+    {% for r in reviews %}
+        <a href="{% url 'answer-sheet-detail' r.id %}" class="list-row" style="text-decoration:none; color:inherit;">
+            <div class="list-row-main">
+                <div class="avatar" style="font-size:1.1rem;">📄</div>
+                <div>
+                    <div class="list-row-title">{{ r.subject }}</div>
+                    <div class="list-row-meta">{{ r.created_at|date:"M j, Y — g:i A" }}</div>
+                </div>
+            </div>
+            {% if r.is_reviewed %}
+                <span class="badge badge-good">Reviewed</span>
+            {% elif r.error %}
+                <span class="badge badge-critical">Review failed</span>
+            {% else %}
+                <span class="badge badge-neutral">Processing</span>
+            {% endif %}
+        </a>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <p>You haven't uploaded an answer sheet yet.</p>
+        <a href="{% url 'answer-sheet-upload' %}" class="btn btn-primary btn-sm">Upload your first answer sheet</a>
+    </div>
+{% endif %}
+{% endblock %}

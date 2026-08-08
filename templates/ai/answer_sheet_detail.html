@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Answer sheet review{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ review.subject }}</h1>
+        <p class="page-subtitle">Uploaded {{ review.created_at|date:"M j, Y" }}</p>
+    </div>
+    <a href="{% url 'answer-sheet-list' %}" class="btn btn-secondary">&larr; All reviews</a>
+</div>
+
+<div class="dashboard-grid">
+    <div>
+        <div class="section">
+            <div class="section-header"><h2>Your answer sheet</h2></div>
+            <div class="card" style="padding: var(--space-2);">
+                <img src="{{ review.image.url }}" alt="Uploaded answer sheet" style="width:100%; border-radius: var(--radius-md); display:block;">
+            </div>
+        </div>
+
+        {% if review.is_reviewed %}
+            {% if review.transcription %}
+                <div class="section">
+                    <div class="section-header"><h2>What the AI read</h2></div>
+                    <div class="card">
+                        <p style="margin:0; white-space:pre-wrap; color: var(--color-text-secondary);">{{ review.transcription }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        {% elif review.error %}
+            <div class="empty-state">
+                <p>The AI review couldn't be completed: {{ review.error }}</p>
+                <a href="{% url 'answer-sheet-upload' %}" class="btn btn-primary btn-sm">Try again</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div>
+        {% if review.is_reviewed %}
+            <div class="section">
+                <div class="ai-card">
+                    <span class="ai-card-label">✨ AI feedback</span>
+                    <p>{{ review.overall_feedback }}</p>
+                    <p style="color: var(--color-text); white-space: pre-wrap; margin:0;">{{ review.improvement_suggestions }}</p>
+                </div>
+            </div>
+
+            {% if review.strengths %}
+                <div class="section">
+                    <div class="section-header"><h2>What went well</h2></div>
+                    <div class="chip-row">
+                        {% for s in review.strengths %}<span class="chip chip-good">{{ s }}</span>{% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if review.mistakes %}
+                <div class="section">
+                    <div class="section-header"><h2>Mistakes to fix</h2></div>
+                    <div class="chip-row">
+                        {% for m in review.mistakes %}<span class="chip chip-warning">{{ m }}</span>{% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="empty-state"><p>Waiting on the AI review…</p></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
